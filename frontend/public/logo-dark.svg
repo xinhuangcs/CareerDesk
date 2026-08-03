@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="256" height="256" role="img" aria-label="CareerDesk">
+  <title>CareerDesk</title>
+  <line x1="15" y1="9" x2="15" y2="40" fill="none" stroke="#eeedeb" stroke-width="7.5" stroke-linecap="round"/>
+  <path d="M15 10 L38.5 18 L15 26 Z" fill="#c2410c" stroke="#c2410c" stroke-width="5" stroke-linejoin="round"/>
+</svg>

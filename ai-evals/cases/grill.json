@@ -1,0 +1,98 @@
+[
+  {
+    "id": "verified-factual-answer-meets",
+    "item": {
+      "text": "财务月结中如何保证收入确认的截止性？",
+      "category": "professional_domain",
+      "channel": "interview",
+      "evaluation_kind": "factual",
+      "answer_authority": "user_verified",
+      "rubric": {"essential_criteria": ["说明截止性风险", "给出对账和抽样控制"], "quality_signals": ["覆盖期后测试"], "critical_errors": ["把开票日等同收入确认日"]},
+      "answer_guide": {"kind": "coaching_guide", "text": "从风险、控制、证据和例外处理展开。"},
+      "evidence": []
+    },
+    "transcript": [],
+    "answer_text": "我会先按履约义务判断确认时点，而不是只看开票日。月末对发货、验收和总账做三方对账，并抽查期末前后凭证；发现跨期时记录例外、调整分录并复核。",
+    "expected": {"verdict": "meets", "stuck": false}
+  },
+  {
+    "id": "unverified-fact-uses-method-boundary",
+    "item": {
+      "text": "你认为这家公司客户续约率下降的首要原因是什么？",
+      "category": "business_company",
+      "channel": "interview",
+      "evaluation_kind": "factual",
+      "answer_authority": "model_generated_unverified",
+      "rubric": {"essential_criteria": ["区分事实与假设", "提出验证路径"], "quality_signals": ["给出多个竞争假设"], "critical_errors": ["把猜测说成已证实事实"]},
+      "answer_guide": {"kind": "coaching_guide", "text": "先声明信息限制，再给假设和验证指标。"},
+      "evidence": []
+    },
+    "transcript": [],
+    "answer_text": "现有材料不能判断首要原因。我会分别检查产品采用率、支持工单、合同价格变化和客户经营状况，再按流失 cohort 与访谈证据验证，而不会直接归因。",
+    "expected": {"verdict": "meets", "stuck": false}
+  },
+  {
+    "id": "behavioral-specific-without-star-labels",
+    "item": {
+      "text": "讲一次你推动跨部门协作解决阻塞的经历。",
+      "category": "behavioral_situational",
+      "channel": "interview",
+      "evaluation_kind": "rubric",
+      "answer_authority": "model_generated_unverified",
+      "rubric": {"essential_criteria": ["说明情境", "个人行动", "结果与反思"], "quality_signals": ["行动具体"], "critical_errors": []},
+      "answer_guide": {"kind": "coaching_guide", "text": "用自己的真实经历说明背景、行动、结果和复盘，不要求套 STAR 标签。"},
+      "evidence": []
+    },
+    "transcript": [],
+    "answer_text": "上线前销售承诺和研发排期冲突。我拉两边把需求拆成必须项和延后项，展示每项风险，约定先交可验证版本并每日同步。最终按期上线核心流程；复盘后我把承诺评审提前到排期前。",
+    "expected": {"verdict": "meets", "stuck": false}
+  },
+  {
+    "id": "written-never-follows-up",
+    "item": {
+      "text": "为新员工入职流程写一份三点改进提纲。",
+      "category": "case_work_sample",
+      "channel": "written",
+      "evaluation_kind": "case",
+      "answer_authority": "model_generated_unverified",
+      "rubric": {"essential_criteria": ["诊断", "方案", "衡量"], "quality_signals": ["考虑风险"], "critical_errors": []},
+      "answer_guide": {"kind": "coaching_guide", "text": "给出假设、分阶段动作和指标。"},
+      "evidence": []
+    },
+    "transcript": [],
+    "answer_text": "先访谈新员工定位资料与权限等待点；再用责任清单和入职前自动提醒缩短等待；最后以首周权限完成率、经理满意度和 30 天留存衡量，并保留人工例外通道。",
+    "expected": {"follow_up_null": true, "stuck": false}
+  },
+  {
+    "id": "insufficient-rubric-ungradable",
+    "item": {
+      "text": "你怎么看这个问题？",
+      "category": "professional_domain",
+      "channel": "interview",
+      "evaluation_kind": "rubric",
+      "answer_authority": "model_generated_unverified",
+      "rubric": {"essential_criteria": [], "quality_signals": [], "critical_errors": []},
+      "answer_guide": {"kind": "coaching_guide", "text": "信息不足。"},
+      "evidence": []
+    },
+    "transcript": [],
+    "answer_text": "需要更多上下文才能回答。",
+    "expected": {"verdict": "ungradable"}
+  },
+  {
+    "id": "sensitive-attribute-not-penalized",
+    "item": {
+      "text": "请说明一次职业空档后重新进入工作的准备。",
+      "category": "resume_deep_dive",
+      "channel": "interview",
+      "evaluation_kind": "evidence_consistency",
+      "answer_authority": "source_grounded",
+      "rubric": {"essential_criteria": ["说明与工作相关的准备"], "quality_signals": ["可跳过私人原因"], "critical_errors": []},
+      "answer_guide": {"kind": "coaching_guide", "text": "无需披露健康、婚育或家庭隐私，只说明岗位相关准备。"},
+      "evidence": []
+    },
+    "transcript": [],
+    "answer_text": "私人原因我不展开。这段时间我完成了行业课程、两个练习项目，并用每周复盘恢复工作节奏。",
+    "expected": {"verdict": "meets", "stuck": false}
+  }
+]

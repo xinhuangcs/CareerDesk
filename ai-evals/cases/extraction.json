@@ -1,0 +1,167 @@
+[
+  {
+    "id": "interview-questions-and-stuck",
+    "today": "2026-07-16",
+    "text": "今天字节跳动后端工程师二面，问了 RRF 排名融合和检查点恢复。RRF 答得还行，检查点幂等我卡住了。",
+    "expected_fields": {
+      "company": "字节跳动",
+      "position": "后端工程师",
+      "history.step": "二面",
+      "history.date": "2026-07-16",
+      "projected_state.stage": "interviewing",
+      "projected_state.current_step": "二面"
+    },
+    "expected_questions": [
+      {"keywords": ["RRF"], "stuck": false},
+      {"keywords": ["检查点"], "stuck": true}
+    ]
+  },
+  {
+    "id": "application-created",
+    "today": "2026-07-16",
+    "text": "今天申请了米哈游的 AI 应用工程师岗位。",
+    "expected_fields": {
+      "company": "米哈游",
+      "position": "AI 应用工程师",
+      "history.date": "2026-07-16",
+      "projected_state.stage": "applied"
+    },
+    "expected_questions": []
+  },
+  {
+    "id": "voluntary-withdrawal",
+    "today": "2026-07-16",
+    "text": "腾讯那个岗我主动不投了，今天撤回申请。",
+    "expected_fields": {
+      "company": "腾讯",
+      "position": null,
+      "history.date": "2026-07-16",
+      "projected_state.stage": "withdrawn"
+    },
+    "expected_questions": []
+  },
+  {
+    "id": "company-rejection",
+    "today": "2026-07-16",
+    "text": "阿里今天通知我后端工程师岗位没通过。",
+    "expected_fields": {
+      "company": "阿里",
+      "position": "后端工程师",
+      "history.outcome": "failed",
+      "history.date": "2026-07-16",
+      "projected_state.stage": "rejected"
+    },
+    "expected_questions": []
+  },
+  {
+    "id": "next-action-date",
+    "today": "2026-07-16",
+    "text": "DTO 学生助理今天一面结束，对方明确约我 2026 年 7 月 20 日下午二面。",
+    "expected_fields": {
+      "company": "DTO",
+      "position": "学生助理",
+      "history.step": "一面",
+      "history.date": "2026-07-16",
+      "projected_state.stage": "interviewing",
+      "projected_state.current_step": "一面",
+      "next_action.stage": "interviewing",
+      "next_action.step": "二面",
+      "next_action.date": "2026-07-20"
+    },
+    "expected_questions": []
+  },
+  {
+    "id": "intern-pm-channel-relative-date",
+    "today": "2026-07-16",
+    "text": "上周五在实习僧上投了叠纸游戏的产品经理岗位，到今天还没收到回复。",
+    "expected_fields": {
+      "company": "叠纸游戏",
+      "position": "产品经理",
+      "history.date": "2026-07-10",
+      "projected_state.stage": "applied",
+      "channel": "实习僧"
+    },
+    "expected_questions": []
+  },
+  {
+    "id": "talent-pool-hc-freeze",
+    "today": "2026-07-16",
+    "text": "招商银行 HR 今天说我的信息技术工程师岗位进人才池了，HC 冻结，等恢复招聘再联系我。",
+    "expected_fields": {
+      "company": "招商银行",
+      "position": "信息技术工程师",
+      "history.date": "2026-07-16",
+      "projected_state.stage": "pooled"
+    },
+    "expected_questions": []
+  },
+  {
+    "id": "english-overseas-interview-passed",
+    "today": "2026-07-16",
+    "text": "Yesterday I passed the second round interview for the Backend Engineer role at Stripe. They asked about database indexing and I struggled to explain B+ tree internals.",
+    "expected_fields": {
+      "company": "Stripe",
+      "position": "Backend Engineer",
+      "history.outcome": "passed",
+      "history.date": "2026-07-15",
+      "projected_state.stage": "interviewing"
+    },
+    "expected_questions": [
+      {"keywords": ["B+"], "stuck": true}
+    ]
+  },
+  {
+    "id": "soe-written-assessment-waiting",
+    "today": "2026-07-16",
+    "text": "今天做完了国家电网的行测测评，等出结果。",
+    "expected_fields": {
+      "company": "国家电网",
+      "position": null,
+      "history.date": "2026-07-16",
+      "projected_state.stage": "written_test",
+      "next_action.step": "等待结果"
+    },
+    "expected_questions": []
+  },
+  {
+    "id": "career-change-offer",
+    "today": "2026-07-16",
+    "text": "今天拿到了快手电商运营的 offer，从机械转行运营总算成了。",
+    "expected_fields": {
+      "company": "快手",
+      "position": "电商运营",
+      "history.date": "2026-07-16",
+      "projected_state.stage": "offer"
+    },
+    "expected_questions": []
+  },
+  {
+    "id": "completed-step-preserves-unspecified-plan",
+    "today": "2026-07-16",
+    "text": "今天完成了澄海科技平台工程师的二面，目前还是面试中；我没有说要取消或改动之后的安排。",
+    "expected_fields": {
+      "company": "澄海科技",
+      "position": "平台工程师",
+      "history.step": "二面",
+      "history.date": "2026-07-16",
+      "projected_state.stage": "interviewing",
+      "projected_state.current_step": "二面",
+      "clear_next_action": false,
+      "next_action": null
+    },
+    "expected_questions": []
+  },
+  {
+    "id": "explicit-next-action-clear",
+    "today": "2026-07-16",
+    "text": "取消澜图数据后端工程师原定的终面安排，暂时没有新的下一步；岗位仍在面试中。",
+    "expected_fields": {
+      "company": "澜图数据",
+      "position": "后端工程师",
+      "projected_state.stage": "interviewing",
+      "clear_next_action": true,
+      "next_action": null
+    },
+    "expected_questions": []
+  }
+]

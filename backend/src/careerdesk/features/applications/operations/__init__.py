@@ -1,0 +1,65 @@
+"""Feature-private entry point for high-risk Application operations."""
+
+from .delete import (
+    ApplicationDeleteOperationConflict,
+    ApplicationDeleteOperationNotFound,
+    approve_application_delete_operation,
+    get_application_delete_operation,
+    list_pending_application_delete_operations,
+    prepare_all_application_delete_operations,
+    prepare_application_delete_operation,
+    prepare_application_delete_operations,
+    reject_application_delete_operation,
+)
+from .merge import (
+    ApplicationMergeOperationConflict,
+    ApplicationMergeOperationNotFound,
+    approve_application_merge_operation,
+    get_application_merge_operation,
+    has_completed_application_merge_lineage_in_transaction,
+    list_pending_application_merge_operations,
+    prepare_application_merge_operation,
+    reject_application_merge_operation,
+)
+from .update import (
+    ApplicationUpdateOperationConflict,
+    ApplicationUpdateOperationNotFound,
+    MAX_APPLICATION_UPDATE_BATCH_ITEMS,
+    execute_application_update_batch,
+    execute_application_update_operation,
+    get_application_update_operation,
+    get_application_update_undo_command_status,
+    list_application_update_operations_for_turn,
+    undo_application_update_operation,
+)
+from .update_models import ApplicationUpdateOperationDTO
+
+__all__ = [
+    "ApplicationDeleteOperationConflict",
+    "ApplicationDeleteOperationNotFound",
+    "approve_application_delete_operation",
+    "get_application_delete_operation",
+    "list_pending_application_delete_operations",
+    "prepare_all_application_delete_operations",
+    "prepare_application_delete_operation",
+    "prepare_application_delete_operations",
+    "reject_application_delete_operation",
+    "ApplicationMergeOperationConflict",
+    "ApplicationMergeOperationNotFound",
+    "approve_application_merge_operation",
+    "get_application_merge_operation",
+    "has_completed_application_merge_lineage_in_transaction",
+    "list_pending_application_merge_operations",
+    "prepare_application_merge_operation",
+    "reject_application_merge_operation",
+    "ApplicationUpdateOperationConflict",
+    "ApplicationUpdateOperationNotFound",
+    "ApplicationUpdateOperationDTO",
+    "MAX_APPLICATION_UPDATE_BATCH_ITEMS",
+    "execute_application_update_batch",
+    "execute_application_update_operation",
+    "get_application_update_operation",
+    "get_application_update_undo_command_status",
+    "list_application_update_operations_for_turn",
+    "undo_application_update_operation",
+]

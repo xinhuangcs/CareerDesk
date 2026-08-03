@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "packages": {
+    "cobble": {
+      "version": "0.1.4",
+      "license": "BSD-2-Clause",
+      "template": "BSD-2-Clause.txt",
+      "copyright": "Copyright (c) Michael Williamson",
+      "source": "https://github.com/mwilliamson/python-cobble"
+    },
+    "flatbuffers": {
+      "version": "25.12.19",
+      "license": "Apache-2.0",
+      "template": "Apache-2.0.txt",
+      "copyright": "Copyright 2014-2020 Google Inc.",
+      "source": "https://github.com/google/flatbuffers"
+    },
+    "jieba": {
+      "version": "0.42.1",
+      "license": "MIT",
+      "template": "MIT.txt",
+      "copyright": "Copyright (c) 2013 Sun Junyi",
+      "source": "https://github.com/fxsjy/jieba"
+    },
+    "magika": {
+      "version": "0.6.3",
+      "license": "Apache-2.0",
+      "template": "Apache-2.0.txt",
+      "copyright": "Copyright 2024-2025 Google LLC",
+      "source": "https://github.com/google/magika"
+    },
+    "markitdown": {
+      "version": "0.1.6",
+      "license": "MIT",
+      "template": "MIT.txt",
+      "copyright": "Copyright (c) Microsoft Corporation.",
+      "source": "https://github.com/microsoft/markitdown"
+    },
+    "primp": {
+      "version": "1.3.1",
+      "license": "MIT",
+      "template": "MIT.txt",
+      "copyright": "Copyright (c) 2024 deedy5",
+      "source": "https://github.com/deedy5/primp"
+    },
+    "proxy-tools": {
+      "version": "0.1.0",
+      "license": "BSD-3-Clause",
+      "template": "BSD-3-Clause.txt",
+      "copyright": "Copyright (c) 2013 Armin Ronacher\nCopyright (c) 2014 Jonathan Tushman",
+      "source": "https://github.com/jtushman/proxy_tools"
+    },
+    "pyobjc": {
+      "version": "12.2.1",
+      "license": "MIT",
+      "template": "MIT.txt",
+      "copyright": "Copyright 2002, 2003 - Bill Bumgarner, Ronald Oussoren, Steve Majewski, Lele Gaifax, et.al.\nCopyright 2003-2025 - Ronald Oussoren",
+      "source": "https://github.com/ronaldoussoren/pyobjc"
+    },
+    "sqlite-vec": {
+      "version": "0.1.9",
+      "license": "MIT",
+      "template": "MIT.txt",
+      "copyright": "Copyright (c) 2024 Alex Garcia",
+      "source": "https://github.com/asg017/sqlite-vec"
+    }
+  }
+}

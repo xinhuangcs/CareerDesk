@@ -1,0 +1,397 @@
+[
+  {
+    "id": "direct-record-review",
+    "prompt": "记录一下：今天字节二面问了 RRF 和检查点恢复，我在幂等追问上卡住了。",
+    "expected_first_skill": null,
+    "expected_first_business_tool": "record_review",
+    "expected_arguments": {}
+  },
+  {
+    "id": "direct-record-multi-role-progress",
+    "prompt": "帮我更新一下最近的秋招进展：前天（7月31日）我参加了微众银行‘分布式系统研发工程师’的技术一面，昨天收到通知说一面通过了，技术二面安排在8月5日下午2点，优先级设为高；昨天我还收到了大疆‘服务端研发工程师’一面通过的消息，二面暂时还没排期，也设为高优先级。今天（8月2日）我通过官网投递了OPPO的‘云服务后端开发工程师’，目前处于简历筛选阶段；另外通过学长内推了vivo的‘互联网服务端开发工程师’，内推已经提交，优先级设为中。还有一个是我7月30日投递的货拉拉‘订单平台后端开发工程师’，今天收到了在线测评通知，测评安排在明天（8月3日）晚上7点，完成后如果通过就进入技术一面。",
+    "expected_first_skill": null,
+    "expected_first_business_tool": "record_review",
+    "expected_arguments": {}
+  },
+  {
+    "id": "direct-correct-application-stage-backward",
+    "prompt": "我香港浸会大学的申请又回到笔试阶段。",
+    "seed_reviews": [
+      {
+        "text": "香港浸会大学副教授岗位进入面试阶段",
+        "today": "2026-07-20",
+        "extraction": {
+          "company": "香港浸会大学",
+          "position": "副教授",
+          "channel": null,
+          "history": {
+            "step": "面试",
+            "date": "2026-07-20",
+            "outcome": null,
+            "summary": "香港浸会大学副教授岗位进入面试阶段"
+          },
+          "projected_state": {"stage": "interviewing", "current_step": "面试"},
+          "clear_next_action": false,
+          "next_action": null,
+          "questions": [],
+          "mood": null,
+          "time_of_day": null,
+          "factors": []
+        }
+      }
+    ],
+    "expected_first_skill": null,
+    "expected_first_business_tool": "update_application",
+    "expected_arguments": {
+      "updates": [
+        {
+          "company": "香港浸会大学",
+          "position": "副教授",
+          "new_stage": "written_test",
+          "clear_current_step": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "direct-update-application-jd",
+    "prompt": "把字节跳动后端工程师的 JD 补充为：负责 Python、FastAPI 和 PostgreSQL。",
+    "seed_reviews": [
+      {
+        "text": "投了字节跳动的后端工程师岗",
+        "today": "2026-07-16",
+        "extraction": {
+          "company": "字节跳动",
+          "position": "后端工程师",
+          "channel": null,
+          "history": {
+            "step": "提交申请",
+            "date": "2026-07-10",
+            "outcome": null,
+            "summary": "投递字节跳动后端工程师岗"
+          },
+          "projected_state": {"stage": "applied", "current_step": "已提交"},
+          "clear_next_action": false,
+          "next_action": null,
+          "questions": [],
+          "mood": null,
+          "time_of_day": null,
+          "factors": []
+        }
+      }
+    ],
+    "expected_first_skill": null,
+    "expected_first_business_tool": "update_application",
+    "expected_arguments": {
+      "updates": [
+        {
+          "company": "字节跳动",
+          "position": "后端工程师",
+          "new_jd_text": "负责 Python、FastAPI 和 PostgreSQL。"
+        }
+      ]
+    }
+  },
+  {
+    "id": "skill-correct-review-entry-directly",
+    "prompt": "刚才腾讯后端复盘说错了：实际是 2026 年 7 月 13 日二面，而且通过了。直接修正刚才那条历程，不要新增历程。",
+    "seed_reviews": [
+      {
+        "text": "腾讯后端一面结束了",
+        "today": "2026-07-16",
+        "extraction": {
+          "company": "腾讯",
+          "position": "后端",
+          "channel": null,
+          "history": {
+            "step": "一面",
+            "date": "2026-07-12",
+            "outcome": null,
+            "summary": "腾讯后端一面完成"
+          },
+          "projected_state": {"stage": "interviewing", "current_step": "一面"},
+          "clear_next_action": false,
+          "next_action": null,
+          "questions": [],
+          "mood": null,
+          "time_of_day": null,
+          "factors": []
+        }
+      }
+    ],
+    "expected_first_skill": null,
+    "expected_first_business_tool": "manage_review",
+    "expected_arguments": {
+      "action": "edit_timeline_entry",
+      "company": "腾讯",
+      "new_step": "二面",
+      "new_date": "2026-07-13",
+      "new_outcome": "passed"
+    }
+  },
+  {
+    "id": "direct-update-application-note",
+    "prompt": "记一下字节跳动后端工程师这个岗位：下周找内推人确认 HC。",
+    "seed_reviews": [
+      {
+        "text": "投了字节跳动的后端工程师岗",
+        "today": "2026-07-16",
+        "extraction": {
+          "company": "字节跳动",
+          "position": "后端工程师",
+          "channel": null,
+          "history": {
+            "step": "提交申请",
+            "date": "2026-07-10",
+            "outcome": null,
+            "summary": "投递字节跳动后端工程师岗"
+          },
+          "projected_state": {"stage": "applied", "current_step": "已提交"},
+          "clear_next_action": false,
+          "next_action": null,
+          "questions": [],
+          "mood": null,
+          "time_of_day": null,
+          "factors": []
+        }
+      }
+    ],
+    "expected_first_skill": null,
+    "expected_first_business_tool": "update_application",
+    "expected_arguments": {
+      "updates": [
+        {
+          "company": "字节跳动",
+          "position": "后端工程师",
+          "append_note": "下周找内推人确认 HC"
+        }
+      ]
+    }
+  },
+  {
+    "id": "skill-import-single-explicit-batch",
+    "prompt": "帮我批量导入这一条新岗位：终验科技 Agent 工程师，已投递但没有记录日期。JD 是负责本地 Agent、RAG 和 Python。",
+    "expected_first_skill": null,
+    "expected_first_business_tool": "parse_jobs",
+    "expected_arguments": {}
+  },
+  {
+    "id": "direct-delete-proposal",
+    "prompt": "删除我投的测试公司测试岗位。",
+    "seed_reviews": [
+      {
+        "text": "投了测试公司的测试岗位",
+        "today": "2026-07-16",
+        "extraction": {
+          "company": "测试公司",
+          "position": "测试岗位",
+          "channel": null,
+          "history": {
+            "step": "提交申请",
+            "date": "2026-07-10",
+            "outcome": null,
+            "summary": "投递测试公司测试岗位"
+          },
+          "projected_state": {"stage": "applied", "current_step": "已提交"},
+          "clear_next_action": false,
+          "next_action": null,
+          "questions": [],
+          "mood": null,
+          "time_of_day": null,
+          "factors": []
+        }
+      }
+    ],
+    "expected_first_skill": null,
+    "expected_first_business_tool": "delete_application",
+    "expected_arguments": {
+      "company": "测试公司",
+      "position": "测试岗位"
+    }
+  },
+  {
+    "id": "direct-delete-all-proposal",
+    "prompt": "删除求职进展里面的所有岗位申请。",
+    "seed_reviews": [
+      {
+        "text": "投了测试公司的测试岗位",
+        "today": "2026-07-16",
+        "extraction": {
+          "company": "测试公司",
+          "position": "测试岗位",
+          "channel": null,
+          "history": {
+            "step": "提交申请",
+            "date": "2026-07-10",
+            "outcome": null,
+            "summary": "投递测试公司测试岗位"
+          },
+          "projected_state": {"stage": "applied", "current_step": "已提交"},
+          "clear_next_action": false,
+          "next_action": null,
+          "questions": [],
+          "mood": null,
+          "time_of_day": null,
+          "factors": []
+        }
+      },
+      {
+        "text": "投了样例公司的后端岗位",
+        "today": "2026-07-17",
+        "extraction": {
+          "company": "样例公司",
+          "position": "后端岗位",
+          "channel": null,
+          "history": {
+            "step": "提交申请",
+            "date": "2026-07-17",
+            "outcome": null,
+            "summary": "投递样例公司后端岗位"
+          },
+          "projected_state": {"stage": "applied", "current_step": "已提交"},
+          "clear_next_action": false,
+          "next_action": null,
+          "questions": [],
+          "mood": null,
+          "time_of_day": null,
+          "factors": []
+        }
+      }
+    ],
+    "expected_first_skill": null,
+    "expected_first_business_tool": "delete_application",
+    "expected_arguments": {
+      "scope": "all"
+    }
+  },
+  {
+    "id": "direct-timeline-query",
+    "prompt": "查一下我现在都投了哪些岗位。",
+    "expected_first_skill": null,
+    "expected_first_business_tool": "query_timeline",
+    "expected_arguments": {}
+  },
+  {
+    "id": "direct-study-query",
+    "prompt": "看看我最近有哪些知识点还不熟。",
+    "expected_first_skill": null,
+    "expected_first_business_tool": "query_study",
+    "expected_arguments": {}
+  },
+  {
+    "id": "direct-library-query",
+    "prompt": "列一下我已经存过的简历版本。",
+    "expected_first_skill": null,
+    "expected_first_business_tool": "query_library",
+    "expected_arguments": {}
+  },
+  {
+    "id": "direct-grill-query",
+    "prompt": "我上次拷打的成绩和薄弱点是什么？",
+    "expected_first_skill": null,
+    "expected_first_business_tool": "query_grill",
+    "expected_arguments": {}
+  },
+  {
+    "id": "direct-prep-query",
+    "prompt": "查一下字节跳动后端工程师的面前简报准备到哪了。",
+    "expected_first_skill": null,
+    "expected_first_business_tool": "query_prep",
+    "expected_arguments": {}
+  },
+  {
+    "id": "direct-status-query",
+    "prompt": "我复盘的时候记录的状态有什么规律？把反复出现的因素列出来。",
+    "expected_first_skill": null,
+    "expected_first_business_tool": "query_status",
+    "expected_arguments": {}
+  },
+  {
+    "id": "direct-preference-write",
+    "prompt": "记住：我以后只考虑上海和杭州的岗位。",
+    "expected_first_skill": null,
+    "expected_first_business_tool": "preferences",
+    "expected_arguments": {
+      "action": "apply"
+    }
+  },
+  {
+    "id": "direct-preference-read",
+    "prompt": "我之前保存过哪些长期求职偏好？",
+    "expected_first_skill": null,
+    "expected_first_business_tool": "preferences",
+    "expected_arguments": {
+      "action": "list"
+    }
+  },
+  {
+    "id": "skill-import-batch",
+    "prompt": "帮我批量整理这三个新岗位，生成待确认导入：米哈游 AI 工程师、腾讯 大模型应用研究、字节 后端工程师。",
+    "expected_first_skill": null,
+    "expected_first_business_tool": "parse_jobs",
+    "expected_arguments": {}
+  },
+  {
+    "id": "skill-capture-dense-review",
+    "prompt": "按完整复盘流程处理：今天阿里二面，先问 Redis 热 key，再问消息幂等和故障恢复；热 key 答得好，幂等只说了唯一键，面试官追问重试窗口时我卡住了，最后说三天内反馈。",
+    "expected_first_skill": null,
+    "expected_first_business_tool": "record_review",
+    "expected_arguments": {}
+  },
+  {
+    "id": "skill-answer-multi-domain",
+    "prompt": "综合我已有的数据回答：最近投递进展、简历版本和拷打薄弱点分别是什么？",
+    "expected_first_skill": null,
+    "expected_first_business_tool": "query_timeline",
+    "expected_arguments": {}
+  },
+  {
+    "id": "skill-prepare-interview",
+    "prompt": "基于我已有的岗位、简历、项目和题库，帮我规划明天的字节面试准备顺序。",
+    "expected_first_skill": "prepare-for-interview",
+    "expected_first_business_tool": "query_prep",
+    "expected_arguments": {}
+  },
+  {
+    "id": "skill-correct-record",
+    "prompt": "我刚才把最近一条投递记录的当前环节说错了。先找到对应记录，再按安全流程改成一面。",
+    "expected_first_skill": null,
+    "expected_first_business_tool": "query_timeline",
+    "expected_arguments": {}
+  },
+  {
+    "id": "no-tool-concept-explanation",
+    "prompt": "不查我的数据，直接解释一下为什么 RRF 用排名而不是原始分数。",
+    "expected_first_skill": null,
+    "expected_first_business_tool": null,
+    "expected_arguments": {}
+  },
+  {
+    "id": "no-tool-answer-polish",
+    "prompt": "帮我把这句面试回答说得更清楚：我用了缓存所以系统变快了。",
+    "expected_first_skill": null,
+    "expected_first_business_tool": null,
+    "expected_arguments": {}
+  },
+  {
+    "id": "no-tool-salary-question",
+    "prompt": "HR 让我报期望薪资，有什么稳妥的回答思路？不用查我的任何记录。",
+    "expected_first_skill": null,
+    "expected_first_business_tool": null,
+    "expected_arguments": {}
+  },
+  {
+    "id": "no-tool-capability-question",
+    "prompt": "你能帮我做哪些求职相关的事情？只介绍能力，不读取或修改我的数据。",
+    "expected_first_skill": null,
+    "expected_first_business_tool": null,
+    "expected_arguments": {}
+  },
+  {
+    "id": "skill-emotional-support-rejection",
+    "prompt": "今天又被拒了，连续第三家了，感觉自己是不是真的不行，有点撑不住。",
+    "expected_first_skill": "emotional-support",
+    "expected_first_business_tool": null,
+    "expected_arguments": {}
+  }
+]

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "timezone": "Europe/Copenhagen",
+  "schedule": ["before 5am on monday"],
+  "dependencyDashboard": true,
+  "prConcurrentLimit": 3,
+  "prHourlyLimit": 1,
+  "automerge": false,
+  "rebaseWhen": "conflicted",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 5am on the first day of the month"],
+    "automerge": false
+  },
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "schedule": ["at any time"],
+    "automerge": false
+  },
+  "packageRules": [
+    {
+      "description": "Review the complete multi-stage container toolchain together",
+      "matchManagers": ["dockerfile"],
+      "matchDatasources": ["docker"],
+      "matchDepNames": ["node", "python", "ghcr.io/astral-sh/uv"],
+      "groupName": "container toolchain digests",
+      "pinDigests": true,
+      "automerge": false
+    },
+    {
+      "description": "Keep GitHub Actions immutable and manually reviewed",
+      "matchManagers": ["github-actions"],
+      "pinDigests": true,
+      "automerge": false
+    },
+    {
+      "description": "Keep npm and PEP 621 lockfiles in the same review PR",
+      "matchManagers": ["npm", "pep621"],
+      "automerge": false
+    }
+  ]
+}

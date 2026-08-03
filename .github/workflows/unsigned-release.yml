@@ -1,0 +1,332 @@
+name: Tag CI and unsigned desktop release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: unsigned-release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  RELEASE_PYTHON_VERSION: "3.12.12"
+  RELEASE_NODE_VERSION: "22.23.1"
+  RELEASE_UV_VERSION: "0.9.21"
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.metadata.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Require an annotated version tag at the exact main commit
+        id: metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_TYPE}" = "tag"
+          test "$(git cat-file -t "${GITHUB_REF_NAME}")" = "tag"
+          version="$(python3 -c 'import tomllib; print(tomllib.load(open("backend/pyproject.toml", "rb"))["project"]["version"])')"
+          test "${GITHUB_REF_NAME}" = "v${version}"
+          test "$(git rev-parse "${GITHUB_REF_NAME}^{commit}")" = "${GITHUB_SHA}"
+          test "$(git rev-parse refs/remotes/origin/main)" = "${GITHUB_SHA}"
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+
+  quality:
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Scan before tests create ignored artifacts containing synthetic credentials.
+      - name: Scan committed source for secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=8.30.1
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${version}/gitleaks_${version}_linux_x64.tar.gz" | tar -xz -C "${RUNNER_TEMP}" gitleaks
+          "${RUNNER_TEMP}/gitleaks" dir . --no-banner --redact
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.RELEASE_UV_VERSION }}
+          python-version: ${{ env.RELEASE_PYTHON_VERSION }}
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ env.RELEASE_NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Test and build the backend and frontend
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv sync --project backend --locked
+          uvx ruff@0.15.20 check backend/src backend/tests run.py desktop scripts/*.py "ai-evals"/*.py
+          uv run --project backend pytest backend/tests
+          npm --prefix frontend ci
+          npm --prefix frontend run test
+          npm --prefix frontend run typecheck
+          npm --prefix frontend run build
+      - name: Build the wheel and initialize a fresh database from it
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv build --project backend --wheel
+          uv venv "${RUNNER_TEMP}/careerdesk-wheel-smoke"
+          uv pip install --python "${RUNNER_TEMP}/careerdesk-wheel-smoke/bin/python" --no-deps backend/dist/careerdesk-*.whl
+          cd "${RUNNER_TEMP}"
+          "${RUNNER_TEMP}/careerdesk-wheel-smoke/bin/python" "${GITHUB_WORKSPACE}/scripts/wheel_fresh_db_smoke.py"
+
+  python-compat:
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.RELEASE_UV_VERSION }}
+          python-version: "3.13"
+      - run: uv sync --project backend --locked
+      - run: uv run --project backend pytest backend/tests
+
+  docker-runtime:
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build and exercise the Docker runtime contract
+        env:
+          IMAGE: careerdesk-release:${{ github.sha }}
+          PREFIX: jp-${{ github.run_id }}-${{ github.run_attempt }}
+        run: bash scripts/docker_smoke.sh
+
+  macos:
+    needs: [validate, quality, python-compat, docker-runtime]
+    runs-on: macos-15
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.RELEASE_UV_VERSION }}
+          python-version: ${{ env.RELEASE_PYTHON_VERSION }}
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ env.RELEASE_NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      # Signing boundary (do NOT add a signing certificate here). CI stays
+      # zero-key/zero-custody: no --codesign-identity, no p12 Secret. Rationale
+      # See the CI signing-certificate rationale in desktop/README.md.
+      - name: Build and verify the unsigned/ad-hoc macOS bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm --prefix frontend ci
+          npm --prefix frontend run build
+          uv sync --project backend --group desktop-build --locked
+          uv build --project backend --wheel --out-dir "${RUNNER_TEMP}/wheel"
+          uv run --project backend --group desktop-build --locked python desktop/package_desktop.py \
+            --wheel "${RUNNER_TEMP}/wheel/careerdesk-${{ needs.validate.outputs.version }}-py3-none-any.whl" \
+            --output-dir "${RUNNER_TEMP}/desktop-output"
+          codesign --verify --deep --strict "${RUNNER_TEMP}/desktop-output/dist/CareerDesk.app"
+      - name: Run the frozen application and data recovery smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run --project backend python scripts/frozen_artifact_smoke.py \
+            --desktop-executable "${RUNNER_TEMP}/desktop-output/dist/CareerDesk.app/Contents/MacOS/CareerDesk" \
+            --data-executable "${RUNNER_TEMP}/desktop-output/dist/CareerDesk.app/Contents/MacOS/CareerDeskData"
+      - name: Archive with an explicit unsigned filename
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${{ needs.validate.outputs.version }}"
+          output="${RUNNER_TEMP}/desktop-output"
+          release_dir="${RUNNER_TEMP}/CareerDesk-${version}-macos-arm64-UNSIGNED"
+          test "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["code_signing"])' "${output}/build-manifest.json")" = "ad-hoc"
+          mkdir -m 700 "${release_dir}"
+          ditto "${output}/dist/CareerDesk.app" "${release_dir}/CareerDesk.app"
+          cp "${output}/build-manifest.json" "${release_dir}/build-manifest.json"
+          test "$(find "${release_dir}" -mindepth 1 -maxdepth 1 | wc -l | tr -d ' ')" = "2"
+          ditto -c -k --sequesterRsrc --keepParent "${release_dir}" \
+            "${GITHUB_WORKSPACE}/CareerDesk-${version}-macos-arm64-UNSIGNED.zip"
+          unzip -t "${GITHUB_WORKSPACE}/CareerDesk-${version}-macos-arm64-UNSIGNED.zip"
+      - name: Attest the unsigned macOS archive provenance
+        if: github.event.repository.private == false
+        uses: actions/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d # v4.2.1
+        with:
+          subject-path: CareerDesk-${{ needs.validate.outputs.version }}-macos-arm64-UNSIGNED.zip
+      - name: Upload the unsigned macOS archive
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: careerdesk-macos-unsigned-release
+          path: CareerDesk-${{ needs.validate.outputs.version }}-macos-arm64-UNSIGNED.zip
+          if-no-files-found: error
+          retention-days: 7
+
+  windows:
+    needs: [validate, quality, python-compat, docker-runtime]
+    runs-on: windows-2025
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.RELEASE_UV_VERSION }}
+          python-version: ${{ env.RELEASE_PYTHON_VERSION }}
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ env.RELEASE_NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Build and verify the unsigned Windows directory
+        shell: pwsh
+        run: |
+          npm --prefix frontend ci
+          npm --prefix frontend run build
+          uv sync --project backend --group desktop-build --locked
+          uv build --project backend --wheel --out-dir "$env:RUNNER_TEMP\wheel"
+          uv run --project backend --group desktop-build --locked python desktop/package_desktop.py `
+            --wheel "$env:RUNNER_TEMP\wheel\careerdesk-${{ needs.validate.outputs.version }}-py3-none-any.whl" `
+            --output-dir "$env:RUNNER_TEMP\desktop-output"
+      - name: Run the frozen application and data recovery smoke
+        shell: pwsh
+        run: |
+          uv run --project backend python scripts/frozen_artifact_smoke.py `
+            --desktop-executable "$env:RUNNER_TEMP\desktop-output\dist\CareerDesk\CareerDesk.exe" `
+            --data-executable "$env:RUNNER_TEMP\desktop-output\dist\CareerDesk\CareerDeskData.exe"
+      - name: Archive with an explicit unsigned filename
+        shell: pwsh
+        run: |
+          $version = "${{ needs.validate.outputs.version }}"
+          $output = "$env:RUNNER_TEMP\desktop-output"
+          $manifest = Get-Content "$output\build-manifest.json" -Raw | ConvertFrom-Json
+          if ($manifest.code_signing -ne "unsigned") {
+            throw "Windows convenience build must remain explicitly unsigned"
+          }
+          $releaseDir = "$env:RUNNER_TEMP\CareerDesk-$version-windows-x64-UNSIGNED"
+          New-Item -ItemType Directory -Path $releaseDir | Out-Null
+          Copy-Item "$output\dist\CareerDesk" "$releaseDir\CareerDesk" -Recurse
+          Copy-Item "$output\build-manifest.json" "$releaseDir\build-manifest.json"
+          if (@(Get-ChildItem -LiteralPath $releaseDir -Force).Count -ne 2) {
+            throw "unsigned Windows archive must contain only the app and build manifest"
+          }
+          $archive = "$env:GITHUB_WORKSPACE\CareerDesk-$version-windows-x64-UNSIGNED.zip"
+          Compress-Archive -Path $releaseDir -DestinationPath $archive -CompressionLevel Optimal
+          $verifyDir = "$env:RUNNER_TEMP\unsigned-archive-check"
+          Expand-Archive -LiteralPath $archive -DestinationPath $verifyDir
+          $verifiedRelease = "$verifyDir\CareerDesk-$version-windows-x64-UNSIGNED"
+          if (@(Get-ChildItem -LiteralPath $verifiedRelease -Force).Count -ne 2) {
+            throw "verified Windows archive must contain only the app and build manifest"
+          }
+      - name: Attest the unsigned Windows archive provenance
+        if: github.event.repository.private == false
+        uses: actions/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d # v4.2.1
+        with:
+          subject-path: CareerDesk-${{ needs.validate.outputs.version }}-windows-x64-UNSIGNED.zip
+      - name: Upload the unsigned Windows archive
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: careerdesk-windows-unsigned-release
+          path: CareerDesk-${{ needs.validate.outputs.version }}-windows-x64-UNSIGNED.zip
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: [validate, macos, windows]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: careerdesk-*-unsigned-release
+          path: release-assets
+          merge-multiple: true
+      - name: Verify the unsigned release set and generate checksums
+        shell: bash
+        working-directory: release-assets
+        run: |
+          set -euo pipefail
+          version="${{ needs.validate.outputs.version }}"
+          test -f "CareerDesk-${version}-macos-arm64-UNSIGNED.zip"
+          test -f "CareerDesk-${version}-windows-x64-UNSIGNED.zip"
+          test "$(find . -maxdepth 1 -type f -name '*-UNSIGNED.zip' | wc -l | tr -d ' ')" = "2"
+          LC_ALL=C sha256sum CareerDesk-*-UNSIGNED.zip > SHA256SUMS.txt
+      - name: Attach the project license
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f LICENSE
+          cp LICENSE release-assets/LICENSE
+      - name: Publish the existing annotated tag with explicit unsigned warnings
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version="${{ needs.validate.outputs.version }}"
+          notes="$(cat <<EOF
+          ## Download and run
+
+          - **macOS (Apple Silicon):** Download \`CareerDesk-${version}-macos-arm64-UNSIGNED.zip\`, unzip it, then open \`CareerDesk.app\`.
+          - **Windows x64:** Download \`CareerDesk-${version}-windows-x64-UNSIGNED.zip\`, extract the entire archive, then run \`CareerDesk.exe\` inside the \`CareerDesk\` folder.
+
+          **First launch needs one manual approval.** These builds are unsigned, so the OS blocks them by default — that reflects the missing paid certificate, not a detected threat.
+
+          - **macOS:** System Settings → Privacy & Security → Security → **Open Anyway**
+          - **Windows:** "Windows protected your PC" → **More info** → **Run anyway**
+
+          Verify the SHA-256 checksums and build attestation below if you want to confirm the download.
+
+          ## 下载与运行
+
+          - **macOS（Apple 芯片）：** 下载 \`CareerDesk-${version}-macos-arm64-UNSIGNED.zip\`，解压后打开 \`CareerDesk.app\`。
+          - **Windows x64：** 下载 \`CareerDesk-${version}-windows-x64-UNSIGNED.zip\`，完整解压后运行 \`CareerDesk\` 文件夹中的 \`CareerDesk.exe\`。
+
+          **首次打开需要手动放行一次。** 安装包未签名，系统默认会拦下——这是因为没有付费证书，不是检测到风险。
+
+          - **macOS：** 系统设置 →「隐私与安全性」→「安全性」→ 点「仍要打开」
+          - **Windows：** 「Windows 已保护你的电脑」→「更多信息」→「仍要运行」
+
+          需要核对可用下方的 SHA-256 与构建来源证明。
+          EOF
+          )"
+          gh release create "${GITHUB_REF_NAME}" release-assets/* \
+            --repo "${GITHUB_REPOSITORY}" --verify-tag \
+            --notes "${notes}" \
+            --title "CareerDesk ${GITHUB_REF_NAME} (UNSIGNED convenience build)"

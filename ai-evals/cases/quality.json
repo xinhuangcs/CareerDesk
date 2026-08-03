@@ -1,0 +1,69 @@
+[
+  {
+    "id": "grill-method-level-feedback",
+    "task": "grill_feedback",
+    "item": {
+      "text": "如果客户续约率下降，你会怎样定位原因？",
+      "category": "case_work_sample",
+      "channel": "interview",
+      "evaluation_kind": "case",
+      "answer_authority": "model_generated_unverified",
+      "rubric": {"essential_criteria": ["提出假设", "说明验证数据", "给出行动优先级"], "quality_signals": ["区分相关与因果"], "critical_errors": ["编造客户事实"]},
+      "answer_guide": {"kind": "coaching_guide", "text": "按问题界定、竞争假设、验证指标和行动实验展开。"},
+      "evidence": []
+    },
+    "transcript": [],
+    "answer_text": "我先看最近流失客户名单，然后给他们打电话。",
+    "criteria": [
+      {"id": "specific_gap", "text": "gaps 指出回答缺少竞争假设、分群或可验证指标中的至少一项"},
+      {"id": "concrete_fix", "text": "next_step 给出可执行的补充方向，而不是泛泛鼓励"},
+      {"id": "no_fabrication", "text": "输出没有臆造客户、产品或公司事实"}
+    ]
+  },
+  {
+    "id": "basic-generation-grounded",
+    "task": "question_set_generation",
+    "edition": "basic",
+    "question_limit": 8,
+    "materials": [{"kind": "resume", "hash": "quality-basic", "segments": [{"id": "resume:0", "text": "供应链计划专员，负责需求预测；把缺货率从 8% 降至 5%，并协调采购与仓库处理旺季波动。"}]}],
+    "criteria": [
+      {"id": "resume_grounded", "text": "履历深挖或专业题引用 resume:0，且没有虚构未提供的公司、系统或数字"},
+      {"id": "industry_neutral", "text": "问题贴近供应链计划，不套用代码、算法或系统设计八股"},
+      {"id": "varied", "text": "题集同时包含履历深挖、行为情境或专业领域中的至少两类"},
+      {"id": "guide_safe", "text": "answer_guide 提供结构与证据槽位，不替候选人编造经历"}
+    ]
+  },
+  {
+    "id": "custom-generation-research-boundary",
+    "task": "question_set_generation",
+    "edition": "custom",
+    "research_included": true,
+    "question_limit": 8,
+    "materials": [
+      {"kind": "resume", "hash": "quality-custom-r", "segments": [{"id": "resume:0", "text": "招聘专员，负责关键岗位寻访与面试官校准。"}]},
+      {"kind": "jd", "hash": "quality-custom-j", "segments": [{"id": "jd:0", "text": "负责人才地图、招聘数据分析和候选人体验。"}]},
+      {"kind": "research", "hash": "quality-custom-x", "segments": [{"id": "research:0", "basis_kind": "research_reported", "text": "公开记录提到面试包含一次招聘漏斗分析案例。"}, {"id": "research:1", "basis_kind": "research_inference", "text": "据业务扩张推测岗位优先级可能变化快，但未获官方确认。"}]}
+    ],
+    "criteria": [
+      {"id": "authority_boundary", "text": "简历、JD、reported 与 inference 没有互相覆盖，推测没有被表述为确定事实"},
+      {"id": "relevant", "text": "题目围绕招聘、人才地图、数据分析或候选人体验，而非技术八股"},
+      {"id": "refs_valid", "text": "所有 evidence_refs 都来自输入提供的三个 ref ID，basis_kind 与来源匹配"},
+      {"id": "no_sensitive", "text": "题目不询问年龄、婚育、健康、宗教、国籍或其他敏感私人属性"}
+    ]
+  },
+  {
+    "id": "company-report-operational",
+    "task": "company_report",
+    "company": "澈流科技",
+    "materials": {
+      "官网关于页": "澈流科技专注实时数据管道与流式计算平台，服务金融与物流客户，总部深圳。",
+      "官网文化页": "官方价值观：客户第一、长期主义；宣称支持弹性工作。",
+      "员工口碑帖": "节奏快，值班多，但代码评审严格；晋升主要看项目成果。"
+    },
+    "criteria": [
+      {"id": "culture_balanced", "text": "culture 同时呈现官方与员工口碑两个视角"},
+      {"id": "no_filler", "text": "各节没有很有前景之类空话套话"},
+      {"id": "grounded_facts", "text": "结论都能对应到材料事实"}
+    ]
+  }
+]

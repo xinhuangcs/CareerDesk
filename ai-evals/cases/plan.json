@@ -1,0 +1,138 @@
+[
+  {
+    "id": "anchor-from-official-site",
+    "company": "澈流科技",
+    "position": "后端工程师",
+    "jd_excerpt": "负责实时数据管道的后端研发，要求熟悉 Go 与流式计算。",
+    "department": null,
+    "profile": {},
+    "presearch_materials": [
+      {
+        "title": "澈流科技官网 - 实时数据管道",
+        "url": "https://www.cheliu-tech.example.cn/about",
+        "snippet": "澈流科技专注实时数据管道与流式计算平台，总部位于深圳。"
+      }
+    ],
+    "expected": {
+      "anchor_domain_contains": "cheliu-tech.example.cn",
+      "anchor_confidence": "high",
+      "any_query_mentions_company": true
+    }
+  },
+  {
+    "id": "ambiguous-name-low-confidence",
+    "company": "星河科技",
+    "position": "产品经理",
+    "jd_excerpt": "",
+    "department": null,
+    "profile": {},
+    "presearch_materials": [
+      {
+        "title": "星河科技（北京）- 企业级 SaaS",
+        "url": "https://www.xinghe-saas.example.com",
+        "snippet": "星河科技提供企业级协同办公 SaaS 产品。"
+      },
+      {
+        "title": "星河科技（广州）- 跨境电商",
+        "url": "https://www.xinghe-ec.example.net",
+        "snippet": "星河科技主营跨境电商代运营业务。"
+      }
+    ],
+    "expected": {
+      "anchor_confidence": "low"
+    }
+  },
+  {
+    "id": "no-generic-learning-queries",
+    "company": "磐岩存储",
+    "position": "存储引擎工程师",
+    "jd_excerpt": "要求熟悉 LSM 树、RocksDB 与 Go 语言，负责分布式 KV 存储内核研发。",
+    "department": null,
+    "profile": {},
+    "presearch_materials": [],
+    "expected": {
+      "anchor_domain_empty": true,
+      "any_query_mentions_company": true,
+      "query_must_not_contain": ["教程", "入门", "原理详解"]
+    }
+  },
+  {
+    "id": "overseas-company-english-jd",
+    "company": "Nimbus Analytics",
+    "position": "Data Engineer",
+    "jd_excerpt": "Own the batch and streaming pipelines on Spark and Flink; partner with analytics teams on data quality.",
+    "department": null,
+    "profile": {},
+    "presearch_materials": [
+      {
+        "title": "Nimbus Analytics - Company",
+        "url": "https://www.nimbus-analytics.example.io/company",
+        "snippet": "Nimbus Analytics builds a cloud data platform for mid-market retailers, headquartered in Singapore."
+      }
+    ],
+    "expected": {
+      "anchor_domain_contains": "nimbus-analytics.example.io",
+      "anchor_confidence": "high",
+      "any_query_mentions_company": true
+    }
+  },
+  {
+    "id": "operations-role-no-learning-queries",
+    "company": "蓝汐文化",
+    "position": "短视频运营",
+    "jd_excerpt": "负责账号内容排期与投放复盘，熟悉抖音生态，有数据敏感度。",
+    "department": null,
+    "profile": {},
+    "presearch_materials": [],
+    "expected": {
+      "anchor_domain_empty": true,
+      "any_query_mentions_company": true,
+      "query_must_not_contain": ["教程", "入门", "原理详解"]
+    }
+  },
+  {
+    "id": "soe-anchor-from-official-site",
+    "company": "北方轨道集团",
+    "position": "信号系统工程师",
+    "jd_excerpt": "负责城市轨道交通信号系统的联调联试与现场开通。",
+    "department": "信号事业部",
+    "profile": {},
+    "presearch_materials": [
+      {
+        "title": "北方轨道集团官网",
+        "url": "https://www.northrail-group.example.cn",
+        "snippet": "北方轨道集团是轨道交通信号与运维服务供应商，总部位于沈阳。"
+      }
+    ],
+    "expected": {
+      "anchor_domain_contains": "northrail-group.example.cn",
+      "anchor_confidence": "high",
+      "any_query_mentions_company": true
+    }
+  },
+  {
+    "id": "profile-notes-disambiguate",
+    "company": "星河科技",
+    "position": "产品经理",
+    "jd_excerpt": "负责企业协同办公产品的需求分析与版本规划。",
+    "department": null,
+    "profile": {
+      "note": "上次锚定：北京企业级 SaaS 公司，官网 www.xinghe-saas.example.com"
+    },
+    "presearch_materials": [
+      {
+        "title": "星河科技（北京）- 企业级 SaaS",
+        "url": "https://www.xinghe-saas.example.com",
+        "snippet": "星河科技提供企业级协同办公 SaaS 产品。"
+      },
+      {
+        "title": "星河科技（广州）- 跨境电商",
+        "url": "https://www.xinghe-ec.example.net",
+        "snippet": "星河科技主营跨境电商代运营业务。"
+      }
+    ],
+    "expected": {
+      "anchor_domain_contains": "xinghe-saas.example.com"
+    }
+  }
+]

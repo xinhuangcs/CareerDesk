@@ -1,0 +1,109 @@
+[
+  {
+    "id": "backend-selective-lines",
+    "lines": [
+      "教育背景：华东某大学 计算机科学与技术 本科（2022-2026）",
+      "订单中台重构项目：把单体订单模块拆成订单与库存两个服务，用消息队列削峰，写入毛刺下降 70%",
+      "订单中台重构项目：为核心查询接口加了 Redis 与本地缓存两级缓存，P99 延迟从 800ms 降到 300ms",
+      "荣誉奖项：获校级优秀学生称号",
+      "自我评价：学习能力强，能承受较大工作压力"
+    ],
+    "expected": {
+      "family": "backend",
+      "selected_within": [1, 2],
+      "must_not_select": [0, 3, 4]
+    }
+  },
+  {
+    "id": "algorithm-selective-lines",
+    "lines": [
+      "使用 PyTorch 训练文本分类模型，通过数据增强把准确率从 88% 提升到 92%",
+      "复现并改进对比学习方法，优化句向量在检索任务上的表现"
+    ],
+    "expected": {
+      "family": "algorithm",
+      "selected_within": [0, 1]
+    }
+  },
+  {
+    "id": "no-technical-content-empty",
+    "lines": [
+      "教育背景：华北某大学 工商管理 本科",
+      "荣誉奖项：院级三好学生",
+      "自我评价：乐观开朗，喜欢团队合作"
+    ],
+    "expected": {
+      "family": "other",
+      "lines_empty": true
+    }
+  },
+  {
+    "id": "frontend-performance-lines",
+    "lines": [
+      "教育背景：华南某大学 软件工程 本科（2021-2025）",
+      "商城前端性能优化项目：路由懒加载加图片按需加载，首屏 LCP 从 4.2s 降到 1.8s",
+      "商城前端性能优化项目：用虚拟列表重写长订单页，万条数据滚动稳定 60fps",
+      "自我评价：注重细节，追求极致体验"
+    ],
+    "expected": {
+      "family": "frontend",
+      "selected_within": [1, 2],
+      "must_not_select": [0, 3]
+    }
+  },
+  {
+    "id": "data-analyst-warehouse-lines",
+    "lines": [
+      "搭建销售主题数仓分层模型（ODS/DWD/ADS），核心报表产出从 T+2 提速到 T+1",
+      "用 Python 清洗百万级订单数据，配置化规则引擎自动标记异常订单",
+      "荣誉奖项：全国大学生数学建模竞赛省二等奖",
+      "兴趣爱好：羽毛球、摄影"
+    ],
+    "expected": {
+      "family": "data",
+      "selected_within": [0, 1],
+      "must_not_select": [2, 3]
+    }
+  },
+  {
+    "id": "pm-growth-lines-other-family",
+    "lines": [
+      "增长项目：设计新用户邀请裂变活动，注册转化率提升 35%",
+      "增长项目：搭建 AARRR 漏斗看板，定位并修复次日留存流失最大的引导环节",
+      "教育背景：华中某大学 市场营销 本科"
+    ],
+    "expected": {
+      "family": "other",
+      "selected_within": [0, 1],
+      "must_not_select": [2]
+    }
+  },
+  {
+    "id": "english-backend-resume-lines",
+    "lines": [
+      "Education: B.S. in Computer Science, 2022-2026",
+      "Payment gateway: redesigned the retry pipeline with idempotency keys, cutting duplicate charges to zero",
+      "Payment gateway: sharded PostgreSQL by merchant id to sustain 5x traffic growth",
+      "Hobbies: hiking and street photography"
+    ],
+    "expected": {
+      "family": "backend",
+      "selected_within": [1, 2],
+      "must_not_select": [0, 3]
+    }
+  },
+  {
+    "id": "cv-algorithm-lines",
+    "lines": [
+      "自动驾驶感知项目：针对小目标漏检改进 YOLO 检测头，夜间场景 mAP 提升 6 个点",
+      "自动驾驶感知项目：用 TensorRT 做 INT8 量化部署，单帧推理延迟下降 40%",
+      "教育背景：东北某大学 自动化 硕士",
+      "荣誉奖项：研究生学业奖学金"
+    ],
+    "expected": {
+      "family": "algorithm",
+      "selected_within": [0, 1],
+      "must_not_select": [2, 3]
+    }
+  }
+]

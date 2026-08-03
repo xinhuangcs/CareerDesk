@@ -1,0 +1,97 @@
+[
+  {
+    "id": "software-basic", "edition": "basic", "question_limit": 8,
+    "materials": [{"kind": "resume", "hash": "r-software", "segments": [{"id": "resume:0", "text": "后端工程师，负责订单服务；通过幂等键和唯一索引降低重复写入，参与事故复盘。"}]}],
+    "must_not_contain": ["项目专场", "标准答案"]
+  },
+  {
+    "id": "software-custom-no-research", "edition": "custom", "question_limit": 8,
+    "materials": [{"kind": "resume", "hash": "r-software", "segments": [{"id": "resume:0", "text": "后端工程师，负责订单服务与稳定性。"}]}, {"kind": "jd", "hash": "j-software", "segments": [{"id": "jd:0", "text": "负责高并发交易系统，要求故障演练、数据库和跨团队协作。"}]}],
+    "must_not_contain": ["公司文化", "据调研"]
+  },
+  {
+    "id": "software-custom-with-research", "edition": "custom", "research_included": true, "question_limit": 8,
+    "materials": [{"kind": "resume", "hash": "r-software", "segments": [{"id": "resume:0", "text": "后端工程师，负责订单服务与稳定性。"}]}, {"kind": "jd", "hash": "j-software", "segments": [{"id": "jd:0", "text": "负责高并发交易系统和故障演练。"}]}, {"kind": "research", "hash": "x-software", "segments": [{"id": "research:0", "basis_kind": "research_reported", "text": "公开面经报告包含系统故障排查案例。"}, {"id": "research:1", "basis_kind": "research_inference", "text": "据此推测案例分析权重可能较高，但未获官方确认。"}]}],
+    "must_not_contain": ["一定会考"]
+  },
+
+  {
+    "id": "sales-basic", "edition": "basic", "question_limit": 8,
+    "materials": [{"kind": "resume", "hash": "r-sales", "segments": [{"id": "resume:0", "text": "企业客户成功经理，管理 40 家客户；通过季度业务复盘改善采用率，并处理一次重大续约异议。"}]}],
+    "must_not_contain": ["算法", "系统设计"]
+  },
+  {
+    "id": "sales-custom-no-research", "edition": "custom", "question_limit": 8,
+    "materials": [{"kind": "resume", "hash": "r-sales", "segments": [{"id": "resume:0", "text": "企业客户成功经理，负责续约与采用率提升。"}]}, {"kind": "jd", "hash": "j-sales", "segments": [{"id": "jd:0", "text": "负责大型企业客户落地、续约预测、价值沟通和风险升级。"}]}],
+    "must_not_contain": ["代码", "据调研"]
+  },
+  {
+    "id": "sales-custom-with-research", "edition": "custom", "research_included": true, "question_limit": 8,
+    "materials": [{"kind": "resume", "hash": "r-sales", "segments": [{"id": "resume:0", "text": "企业客户成功经理，负责续约与采用率提升。"}]}, {"kind": "jd", "hash": "j-sales", "segments": [{"id": "jd:0", "text": "负责大型企业客户落地与价值沟通。"}]}, {"kind": "research", "hash": "x-sales", "segments": [{"id": "research:0", "basis_kind": "research_reported", "text": "公开候选人记录提到面试包含客户升级角色扮演。"}]}],
+    "must_not_contain": ["手撕", "八股"]
+  },
+
+  {
+    "id": "finance-basic", "edition": "basic", "question_limit": 8,
+    "materials": [{"kind": "resume", "hash": "r-finance", "segments": [{"id": "resume:0", "text": "财务控制专员，执行月结、预算差异分析和内控抽样；发现并纠正一次跨期确认。"}]}],
+    "must_not_contain": ["编程", "唯一标准答案"]
+  },
+  {
+    "id": "finance-custom-no-research", "edition": "custom", "question_limit": 8,
+    "materials": [{"kind": "resume", "hash": "r-finance", "segments": [{"id": "resume:0", "text": "财务控制专员，负责月结与内控抽样。"}]}, {"kind": "jd", "hash": "j-finance", "segments": [{"id": "jd:0", "text": "负责收入确认、SOX 控制、审计配合和管理层差异说明。"}]}],
+    "must_not_contain": ["公司文化", "最新准则一定"]
+  },
+  {
+    "id": "finance-custom-with-research", "edition": "custom", "research_included": true, "question_limit": 8,
+    "materials": [{"kind": "resume", "hash": "r-finance", "segments": [{"id": "resume:0", "text": "财务控制专员，负责月结与内控抽样。"}]}, {"kind": "jd", "hash": "j-finance", "segments": [{"id": "jd:0", "text": "负责收入确认、SOX 控制与审计配合。"}]}, {"kind": "research", "hash": "x-finance", "segments": [{"id": "research:0", "basis_kind": "research_reported", "text": "公开流程说明提到笔试包含控制缺陷分析。"}]}],
+    "must_not_contain": ["法律意见", "保证合规"]
+  },
+
+  {
+    "id": "hr-basic", "edition": "basic", "question_limit": 8,
+    "materials": [{"kind": "resume", "hash": "r-hr", "segments": [{"id": "resume:0", "text": "招聘专员，负责从需求澄清到 offer；优化面试官校准流程并缩短招聘周期。"}]}],
+    "must_not_contain": ["婚育", "年龄"]
+  },
+  {
+    "id": "hr-custom-no-research", "edition": "custom", "question_limit": 8,
+    "materials": [{"kind": "resume", "hash": "r-hr", "segments": [{"id": "resume:0", "text": "招聘专员，负责需求澄清、寻访和面试官校准。"}]}, {"kind": "jd", "hash": "j-hr", "segments": [{"id": "jd:0", "text": "负责关键岗位招聘、人才地图、候选人体验和招聘数据复盘。"}]}],
+    "must_not_contain": ["婚姻", "宗教"]
+  },
+  {
+    "id": "hr-custom-with-research", "edition": "custom", "research_included": true, "question_limit": 8,
+    "materials": [{"kind": "resume", "hash": "r-hr", "segments": [{"id": "resume:0", "text": "招聘专员，负责需求澄清、寻访和面试官校准。"}]}, {"kind": "jd", "hash": "j-hr", "segments": [{"id": "jd:0", "text": "负责关键岗位招聘和人才地图。"}]}, {"kind": "research", "hash": "x-hr", "segments": [{"id": "research:0", "basis_kind": "research_inference", "text": "公开团队介绍显示业务扩张，推测招聘优先级变化较快。"}]}],
+    "must_not_contain": ["确定", "个人隐私"]
+  },
+
+  {
+    "id": "career-change-basic", "edition": "basic", "question_limit": 8,
+    "materials": [{"kind": "resume", "hash": "r-change", "segments": [{"id": "resume:0", "text": "五年产线工艺经验，负责良率分析；后自学 SQL 和 Python，完成销量预测练习并转向数据分析。"}]}],
+    "must_not_contain": ["科班不如", "年龄"]
+  },
+  {
+    "id": "career-change-custom-no-research", "edition": "custom", "question_limit": 8,
+    "materials": [{"kind": "resume", "hash": "r-change", "segments": [{"id": "resume:0", "text": "产线工艺背景，做过良率分析并自学数据分析。"}]}, {"kind": "jd", "hash": "j-change", "segments": [{"id": "jd:0", "text": "初级数据分析师，负责数据清洗、指标解释和与业务团队沟通。"}]}],
+    "must_not_contain": ["转行劣势", "大厂"]
+  },
+  {
+    "id": "career-change-custom-with-research", "edition": "custom", "research_included": true, "question_limit": 8,
+    "materials": [{"kind": "resume", "hash": "r-change", "segments": [{"id": "resume:0", "text": "产线工艺背景，做过良率分析并自学数据分析。"}]}, {"kind": "jd", "hash": "j-change", "segments": [{"id": "jd:0", "text": "负责数据清洗、指标解释和业务沟通。"}]}, {"kind": "research", "hash": "x-change", "segments": [{"id": "research:0", "basis_kind": "research_reported", "text": "公开面试记录提到业务指标解释案例。"}]}],
+    "must_not_contain": ["学历歧视", "年龄"]
+  },
+
+  {
+    "id": "sparse-basic", "edition": "basic", "question_limit": 6,
+    "materials": [{"kind": "resume", "hash": "r-sparse", "segments": [{"id": "resume:0", "text": "应届毕业生；参与学生社团活动组织，完成经济学课程。"}]}],
+    "must_not_contain": ["多年管理", "高级专家", "虚构"]
+  },
+  {
+    "id": "sparse-custom-no-research", "edition": "custom", "question_limit": 6,
+    "materials": [{"kind": "resume", "hash": "r-sparse", "segments": [{"id": "resume:0", "text": "应届毕业生；参与学生社团活动组织。"}]}, {"kind": "jd", "hash": "j-sparse", "segments": [{"id": "jd:0", "text": "运营助理，协助活动执行、数据整理和跨团队沟通，可接受应届生。"}]}],
+    "must_not_contain": ["多年经验", "管理团队"]
+  },
+  {
+    "id": "sparse-custom-with-research", "edition": "custom", "research_included": true, "question_limit": 6,
+    "materials": [{"kind": "resume", "hash": "r-sparse", "segments": [{"id": "resume:0", "text": "应届毕业生；参与学生社团活动组织。"}]}, {"kind": "jd", "hash": "j-sparse", "segments": [{"id": "jd:0", "text": "运营助理，协助活动执行与数据整理。"}]}, {"kind": "research", "hash": "x-sparse", "segments": [{"id": "research:0", "basis_kind": "research_inference", "text": "公开职位页面强调学习速度，未披露具体面试题。"}]}],
+    "must_not_contain": ["曾经负责", "确定会考"]
+  }
+]

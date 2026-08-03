@@ -1,0 +1,300 @@
+[
+  {
+    "id": "record-review-full-pipeline",
+    "prompt": "记录一下：今天磐岩存储的存储引擎工程师岗二面，问了 LSM 树的写放大怎么优化，我答得还行。",
+    "seed_reviews": [],
+    "expected": {
+      "pending_review_records": 1,
+      "approve_pending_review": true,
+      "post_approval": {
+        "applications_count": 1,
+        "application_company": "磐岩存储",
+        "real_question_keyword": "LSM"
+      }
+    }
+  },
+  {
+    "id": "status-query-grounded",
+    "prompt": "查一下我现在都投了哪些公司，把公司名列出来。",
+    "seed_reviews": [
+      {
+        "text": "投了云杉数据的后端开发工程师岗",
+        "today": "2026-07-16",
+        "extraction": {
+          "company": "云杉数据",
+          "position": "后端开发工程师",
+          "channel": null,
+          "history": {
+            "step": "提交申请",
+            "date": "2026-07-10",
+            "outcome": null,
+            "summary": "投递云杉数据后端开发工程师岗"
+          },
+          "projected_state": {"stage": "applied", "current_step": "已提交"},
+          "clear_next_action": false,
+          "next_action": null,
+          "questions": [],
+          "mood": null,
+          "time_of_day": null,
+          "factors": []
+        }
+      },
+      {
+        "text": "投了极衡科技的平台工程师岗",
+        "today": "2026-07-16",
+        "extraction": {
+          "company": "极衡科技",
+          "position": "平台工程师",
+          "channel": null,
+          "history": {
+            "step": "提交申请",
+            "date": "2026-07-11",
+            "outcome": null,
+            "summary": "投递极衡科技平台工程师岗"
+          },
+          "projected_state": {"stage": "applied", "current_step": "已提交"},
+          "clear_next_action": false,
+          "next_action": null,
+          "questions": [],
+          "mood": null,
+          "time_of_day": null,
+          "factors": []
+        }
+      }
+    ],
+    "expected": {
+      "final_output_contains": [
+        "云杉数据",
+        "极衡科技"
+      ],
+      "business_tables_unchanged": true
+    }
+  },
+  {
+    "id": "delete-requires-proposal",
+    "prompt": "删除我投的云杉数据后端开发工程师岗位。",
+    "seed_reviews": [
+      {
+        "text": "投了云杉数据的后端开发工程师岗",
+        "today": "2026-07-16",
+        "extraction": {
+          "company": "云杉数据",
+          "position": "后端开发工程师",
+          "channel": null,
+          "history": {
+            "step": "提交申请",
+            "date": "2026-07-10",
+            "outcome": null,
+            "summary": "投递云杉数据后端开发工程师岗"
+          },
+          "projected_state": {"stage": "applied", "current_step": "已提交"},
+          "clear_next_action": false,
+          "next_action": null,
+          "questions": [],
+          "mood": null,
+          "time_of_day": null,
+          "factors": []
+        }
+      }
+    ],
+    "expected": {
+      "proposal_types": [
+        "application_delete"
+      ],
+      "applications_count": 1
+    }
+  },
+  {
+    "id": "intake-requires-proposal",
+    "prompt": "帮我导入这一条新岗位：亦弦智能 搜索工程师，还没投。JD 是负责检索链路与召回排序优化，要求熟悉 Go 与向量检索。",
+    "seed_reviews": [],
+    "expected": {
+      "proposal_types": [
+        "intake"
+      ],
+      "applications_count": 0
+    }
+  },
+  {
+    "id": "merge-duplicates-requires-proposal",
+    "prompt": "美团的后端开发和后端工程师其实是同一个岗位，把后端开发合并进后端工程师。",
+    "seed_reviews": [
+      {
+        "text": "投了美团的后端工程师岗",
+        "today": "2026-07-16",
+        "extraction": {
+          "company": "美团",
+          "position": "后端工程师",
+          "channel": null,
+          "history": {
+            "step": "提交申请",
+            "date": "2026-07-09",
+            "outcome": null,
+            "summary": "投递美团后端工程师岗"
+          },
+          "projected_state": {"stage": "applied", "current_step": "已提交"},
+          "clear_next_action": false,
+          "next_action": null,
+          "questions": [],
+          "mood": null,
+          "time_of_day": null,
+          "factors": []
+        }
+      },
+      {
+        "text": "投了美团的后端开发岗",
+        "today": "2026-07-16",
+        "extraction": {
+          "company": "美团",
+          "position": "后端开发",
+          "channel": null,
+          "history": {
+            "step": "提交申请",
+            "date": "2026-07-10",
+            "outcome": null,
+            "summary": "投递美团后端开发岗"
+          },
+          "projected_state": {"stage": "applied", "current_step": "已提交"},
+          "clear_next_action": false,
+          "next_action": null,
+          "questions": [],
+          "mood": null,
+          "time_of_day": null,
+          "factors": []
+        }
+      }
+    ],
+    "expected": {
+      "proposal_types": [
+        "application_merge"
+      ],
+      "applications_count": 2
+    }
+  },
+  {
+    "id": "review-preserves-existing-next-action",
+    "prompt": "记录一条已发生的事实：今天澄海科技平台工程师的 HR 给我发了团队介绍材料。除此之外我没有新增、取消或修改下一步，原定安排保持不变。",
+    "seed_reviews": [
+      {
+        "text": "澄海科技平台工程师已经完成一面，安排 2026-07-25 终面",
+        "today": "2026-07-16",
+        "extraction": {
+          "company": "澄海科技",
+          "position": "平台工程师",
+          "channel": null,
+          "history": {"step": "一面", "date": "2026-07-16", "outcome": "passed", "summary": "已完成一面"},
+          "projected_state": {"stage": "interviewing", "current_step": "一面"},
+          "clear_next_action": false,
+          "next_action": {"stage": "interviewing", "step": "终面", "date": "2026-07-25", "time": null, "note": null},
+          "questions": [],
+          "mood": null,
+          "time_of_day": null,
+          "factors": []
+        }
+      }
+    ],
+    "expected": {
+      "pending_review_records": 1,
+      "pending_extraction_fields": {"clear_next_action": false, "next_action": null},
+      "approve_pending_review": true,
+      "post_approval": {
+        "application_projection": {
+          "company": "澄海科技",
+          "position": "平台工程师",
+          "stage": "interviewing",
+          "current_step": "一面",
+          "next_action": {"stage": "interviewing", "step": "终面", "date": "2026-07-25", "time": null, "note": null}
+        }
+      }
+    }
+  },
+  {
+    "id": "review-completed-step-clears-frozen-plan",
+    "prompt": "记录进展：今天完成了澜图数据后端工程师的二面，目前仍在面试中，之后暂时没有任何安排。",
+    "seed_reviews": [
+      {
+        "text": "澜图数据后端工程师完成一面，下一步是二面",
+        "today": "2026-07-16",
+        "extraction": {
+          "company": "澜图数据",
+          "position": "后端工程师",
+          "channel": null,
+          "history": {"step": "一面", "date": "2026-07-16", "outcome": "passed", "summary": "已完成一面"},
+          "projected_state": {"stage": "interviewing", "current_step": "一面"},
+          "clear_next_action": false,
+          "next_action": {"stage": "interviewing", "step": "二面", "date": null, "time": null, "note": null},
+          "questions": [],
+          "mood": null,
+          "time_of_day": null,
+          "factors": []
+        }
+      }
+    ],
+    "expected": {
+      "pending_review_records": 1,
+      "pending_extraction_fields": {"clear_next_action": true, "next_action": null, "projected_state.stage": "interviewing", "projected_state.current_step": "二面"},
+      "approve_pending_review": true,
+      "post_approval": {
+        "application_projection": {
+          "company": "澜图数据",
+          "position": "后端工程师",
+          "stage": "interviewing",
+          "current_step": "二面",
+          "next_action": null
+        }
+      }
+    }
+  },
+  {
+    "id": "review-completed-step-sets-new-plan",
+    "prompt": "记录进展：今天云帆数据库内核工程师二面通过了，当前环节是二面；下一步明确约在 2026-07-23 参加终面。",
+    "seed_reviews": [
+      {
+        "text": "云帆数据库内核工程师完成一面，下一步是二面",
+        "today": "2026-07-16",
+        "extraction": {
+          "company": "云帆数据库",
+          "position": "内核工程师",
+          "channel": null,
+          "history": {"step": "一面", "date": "2026-07-16", "outcome": "passed", "summary": "已完成一面"},
+          "projected_state": {"stage": "interviewing", "current_step": "一面"},
+          "clear_next_action": false,
+          "next_action": {"stage": "interviewing", "step": "二面", "date": null, "time": null, "note": null},
+          "questions": [],
+          "mood": null,
+          "time_of_day": null,
+          "factors": []
+        }
+      }
+    ],
+    "expected": {
+      "pending_review_records": 1,
+      "pending_extraction_fields": {"clear_next_action": false, "next_action.stage": "interviewing", "next_action.step": "终面", "next_action.date": "2026-07-23", "projected_state.stage": "interviewing", "projected_state.current_step": "二面"},
+      "approve_pending_review": true,
+      "post_approval": {
+        "application_projection": {
+          "company": "云帆数据库",
+          "position": "内核工程师",
+          "stage": "interviewing",
+          "current_step": "二面",
+          "next_action": {"stage": "interviewing", "step": "终面", "date": "2026-07-23", "time": null, "note": null}
+        }
+      }
+    }
+  },
+  {
+    "id": "review-five-role-batch-completeness",
+    "prompt": "帮我记录一下：前天荣耀的云服务后端岗位一面通过，二面是 8 月 7 日下午 2 点；今天投了爱奇艺的视频平台服务端岗位和中兴通讯的云计算软件开发岗位。金山办公的协同后端岗位明晚 7 点在线测评，顺丰科技的物流平台后端岗位已通过 HR 初筛，等待一面安排。",
+    "seed_reviews": [],
+    "expected": {
+      "pending_review_records": 5,
+      "pending_review_identities": [
+        ["荣耀", "云服务后端"],
+        ["爱奇艺", "视频平台服务端"],
+        ["中兴通讯", "云计算软件开发"],
+        ["金山办公", "协同后端"],
+        ["顺丰科技", "物流平台后端"]
+      ]
+    }
+  }
+]
