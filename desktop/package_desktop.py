@@ -169,7 +169,14 @@ def stage_wheel(wheel: Path, site: Path) -> WheelIdentity:
     return identity
 
 
-def _windows_version_file(version: str, destination: Path) -> None:
+def _windows_version_file(
+    version: str,
+    destination: Path,
+    *,
+    description: str,
+    internal_name: str,
+    original_filename: str,
+) -> None:
     numbers = version.split("+")[0].split("-")[0].split(".")
     if not 1 <= len(numbers) <= 4 or any(not item.isdigit() for item in numbers):
         raise ValueError(f"Windows 包版本必须是 1 到 4 段数字：{version}")
@@ -182,10 +189,10 @@ def _windows_version_file(version: str, destination: Path) -> None:
         "OS=0x40004, fileType=0x1, subtype=0x0, date=(0, 0)), "
         "kids=[StringFileInfo([StringTable('040904B0', ["
         f"StringStruct('CompanyName', 'CareerDesk'), "
-        f"StringStruct('FileDescription', 'CareerDesk career assistant'), "
+        f"StringStruct('FileDescription', '{description}'), "
         f"StringStruct('FileVersion', '{dotted}'), "
-        f"StringStruct('InternalName', 'CareerDesk'), "
-        f"StringStruct('OriginalFilename', 'CareerDesk.exe'), "
+        f"StringStruct('InternalName', '{internal_name}'), "
+        f"StringStruct('OriginalFilename', '{original_filename}'), "
         f"StringStruct('ProductName', 'CareerDesk'), "
         f"StringStruct('ProductVersion', '{dotted}')"
         "])]), VarFileInfo([VarStruct('Translation', [1033, 1200])])])\n",
@@ -198,6 +205,7 @@ def _build_environment(
     site: Path,
     version: str,
     windows_version_file: Path | None,
+    windows_data_version_file: Path | None,
     legal_dir: Path,
 ) -> dict[str, str]:
     environment = {
@@ -213,10 +221,14 @@ def _build_environment(
         # Ensure spec-time package discovery sees the wheel, not the editable checkout.
         "PYTHONPATH": str(site),
     })
-    if windows_version_file is not None:
-        environment["CAREERDESK_WINDOWS_VERSION_FILE"] = str(windows_version_file)
-    else:
-        environment.pop("CAREERDESK_WINDOWS_VERSION_FILE", None)
+    for name, value in (
+        ("CAREERDESK_WINDOWS_VERSION_FILE", windows_version_file),
+        ("CAREERDESK_WINDOWS_DATA_VERSION_FILE", windows_data_version_file),
+    ):
+        if value is not None:
+            environment[name] = str(value)
+        else:
+            environment.pop(name, None)
     return environment
 
 
@@ -242,11 +254,11 @@ def _artifact_paths(dist: Path, platform_name: str) -> tuple[Path, Path, Path]:
     if platform_name == "darwin":
         artifact = dist / "CareerDesk.app"
         executable = artifact / "Contents" / "MacOS" / "CareerDesk"
-        data_executable = artifact / "Contents" / "MacOS" / "CareerDeskData"
+        data_executable = artifact / "Contents" / "MacOS" / "careerdesk-data"
     else:
         artifact = dist / "CareerDesk"
         executable = artifact / "CareerDesk.exe"
-        data_executable = artifact / "CareerDeskData.exe"
+        data_executable = artifact / "careerdesk-data.exe"
     if (
         not artifact.is_dir()
         or not executable.is_file()
@@ -368,9 +380,26 @@ def build(
     stage_legal_bundle(repository_root=ROOT, destination=legal)
 
     windows_version = None
+    windows_data_version = None
     if host == "win32":
+        # Explorer shows these strings; identical ones made the two executables
+        # indistinguishable apart from their filename.
         windows_version = output / "windows-version.txt"
-        _windows_version_file(identity.version, windows_version)
+        _windows_version_file(
+            identity.version,
+            windows_version,
+            description="CareerDesk career assistant",
+            internal_name="CareerDesk",
+            original_filename="CareerDesk.exe",
+        )
+        windows_data_version = output / "windows-data-version.txt"
+        _windows_version_file(
+            identity.version,
+            windows_data_version,
+            description="CareerDesk backup and restore tool (command line)",
+            internal_name="careerdesk-data",
+            original_filename="careerdesk-data.exe",
+        )
 
     command = [
         sys.executable,
@@ -388,11 +417,20 @@ def build(
             site=site,
             version=identity.version,
             windows_version_file=windows_version,
+            windows_data_version_file=windows_data_version,
             legal_dir=legal,
         ),
         check=True,
     )
     artifact, executable, data_executable = _artifact_paths(dist, host)
+    if host == "win32":
+        # A pre-built .lnk cannot ship in the archive: shortcuts embed absolute
+        # targets unknown at build time. This helper creates one for wherever the
+        # user placed the folder.
+        shortcut_helper = ROOT / "desktop" / "add-desktop-shortcut.cmd"
+        (artifact / "Add-Desktop-Shortcut.cmd").write_bytes(
+            shortcut_helper.read_bytes(),
+        )
     if codesign_identity is not None:
         # PyInstaller identity-signs only the launchers while collected dylibs
         # stay ad-hoc; dyld rejects that mix once the launcher signature is no

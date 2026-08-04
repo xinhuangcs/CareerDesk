@@ -131,7 +131,7 @@ def test_frozen_data_cli_output_is_always_decoded_as_utf8(monkeypatch, tmp_path)
     monkeypatch.setattr(frozen_artifact_smoke.subprocess, "run", fake_run)
 
     frozen_artifact_smoke._run_data_command(
-        [str(tmp_path / "CareerDeskData.exe"), "verify", "smoke.jpbak"],
+        [str(tmp_path / "careerdesk-data.exe"), "verify", "smoke.jpbak"],
         {"SYSTEMROOT": "C:\\Windows"},
     )
 

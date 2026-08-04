@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 import sys
 
@@ -71,8 +72,35 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _held_open_for_double_click(arguments: list[str], *,
+                                windows: bool | None = None,
+                                frozen: bool | None = None) -> bool:
+    """Keep the console open when the tool is double-clicked without a command.
+
+    Explorer launches open a console that closes before the usage text can be
+    read, which makes the tool look broken next to the main app.
+    """
+    windows = (os.name == "nt") if windows is None else windows
+    frozen = bool(getattr(sys, "frozen", False)) if frozen is None else frozen
+    if arguments or not windows or not frozen:
+        return False
+    print("careerdesk-data 是 CareerDesk 的备份/恢复命令行工具；日常使用请打开 CareerDesk。")
+    print("careerdesk-data is CareerDesk's backup/restore command-line tool; "
+          "open CareerDesk for everyday use.")
+    print()
+    _parser().print_help()
+    try:
+        input("\n按回车键关闭 / Press Enter to close...")
+    except EOFError:
+        pass
+    return True
+
+
 def main(argv: list[str] | None = None) -> int:
     configure_console_streams()
+    raw_arguments = list(sys.argv[1:] if argv is None else argv)
+    if _held_open_for_double_click(raw_arguments):
+        return 0
     parser = _parser()
     arguments = parser.parse_args(argv)
     try:

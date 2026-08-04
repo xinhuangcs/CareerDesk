@@ -12,6 +12,7 @@ Environment variables:
     CAREERDESK_HEADLESS  Start the service without any UI when set to 1.
 """
 
+import logging
 import os
 import locale as system_locale
 import shutil
@@ -47,6 +48,12 @@ HOST = "127.0.0.1"
 PORT = int(os.environ.get("PORT", "8000"))
 URL = f"http://{HOST}:{PORT}"
 STARTUP_TIMEOUT_SECONDS = 30.0
+# Closing the window means quit. In-flight turns are already crash-safe (ledger +
+# recovery replay), so escalation may cost at most the current model response,
+# never durable state. Unbounded waiting previously left an invisible resident
+# process whenever a provider call hung.
+_GRACEFUL_CLOSE_SECONDS = 15.0
+_FORCED_CLOSE_SECONDS = 10.0
 
 
 def _startup_locale() -> str:
@@ -123,6 +130,11 @@ class ServerRuntime:
     def request_shutdown(self) -> None:
         """Idempotently stop accepting work; this does not claim the thread has exited."""
         self.server.should_exit = True
+
+    def force_shutdown(self) -> None:
+        """Escalate to Uvicorn's forced exit, abandoning graceful connection waits."""
+        self.server.should_exit = True
+        self.server.force_exit = True
 
     def wait_for_exit(self, timeout: float | None = None) -> bool:
         """Return true only once no server thread can still use the transferred lock."""
@@ -504,6 +516,154 @@ def _request_server_shutdown(
     return runtime.wait_for_exit(timeout=timeout)
 
 
+_FILE_LOGGING_CONFIGURED = False
+_FILE_LOG_HANDLER: logging.Handler | None = None
+
+
+def _configure_file_logging(settings: Any) -> None:
+    """Persist WARNING+ runtime logs where the storage page already points users.
+
+    The windowed app has no console, so without this file an unhandled server
+    error leaves no trace anywhere. Diagnostics must never block startup, so
+    every step including reading the configured location stays inside the guard.
+    """
+    global _FILE_LOGGING_CONFIGURED
+    if _FILE_LOGGING_CONFIGURED:
+        return
+    try:
+        from logging.handlers import RotatingFileHandler
+
+        from careerdesk.platform.storage.private import ensure_private_directory
+
+        directory = ensure_private_directory(Path(settings.log_dir))
+        log_file = directory / "careerdesk.log"
+        handler = RotatingFileHandler(
+            log_file, maxBytes=1_000_000, backupCount=3, encoding="utf-8",
+        )
+        if os.name == "posix":
+            os.chmod(log_file, 0o600)
+        handler.setLevel(logging.WARNING)
+        handler.setFormatter(logging.Formatter(
+            "%(asctime)s %(levelname)s %(name)s %(message)s",
+        ))
+        logging.getLogger().addHandler(handler)
+        global _FILE_LOG_HANDLER
+        _FILE_LOG_HANDLER = handler
+        _FILE_LOGGING_CONFIGURED = True
+        try:
+            from importlib.metadata import version as _distribution_version
+
+            app_version = _distribution_version("careerdesk")
+        except Exception:  # noqa: BLE001 -- version is banner metadata only
+            app_version = "unknown"
+        # One banner per session proves the log pipeline works on the user's
+        # machine, so an empty file can never again mean "unknown state".
+        logging.getLogger("careerdesk.launcher").warning(
+            "CareerDesk %s file logging active on %s", app_version, sys.platform,
+        )
+    except Exception:  # noqa: BLE001 -- logging setup must never prevent startup
+        return
+
+
+def _attach_uvicorn_file_logging() -> None:
+    """Route Uvicorn's own records into the launcher log file.
+
+    Uvicorn's logging config keeps its loggers non-propagating, so protocol-level
+    failures would otherwise reach only the invisible windowed console.
+    """
+    if _FILE_LOG_HANDLER is None:
+        return
+    for logger_name in ("uvicorn", "uvicorn.error"):
+        target = logging.getLogger(logger_name)
+        if _FILE_LOG_HANDLER not in target.handlers:
+            target.addHandler(_FILE_LOG_HANDLER)
+
+
+def _existing_careerdesk_instance(port: int) -> bool:
+    """Best-effort check that the busy port is a healthy CareerDesk instance."""
+    from urllib.request import urlopen
+
+    try:
+        with urlopen(f"http://{HOST}:{port}/healthz", timeout=2) as response:
+            if response.status != 200 or response.read(16).strip() != b"ok":
+                return False
+        with urlopen(f"http://{HOST}:{port}/", timeout=2) as response:
+            return response.status == 200 and b"CareerDesk" in response.read(65536)
+    except Exception:  # noqa: BLE001 -- any failure means "not provably ours"
+        return False
+
+
+def _unblock_dotnet_assemblies() -> int:
+    """Remove mark-of-the-web from bundled .NET assemblies; return how many.
+
+    Explorer's zip extraction tags every file as downloaded, and the .NET
+    Framework then refuses to load such assemblies, which silently degrades the
+    native window into a browser fallback. Stripping the Zone.Identifier stream
+    is safe: the assemblies ship inside our own verified archive.
+    """
+    if os.name != "nt" or not getattr(sys, "frozen", False):
+        return 0
+    bundle_root = Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent / "_internal"))
+    removed = 0
+    for subdirectory in ("pythonnet", "clr_loader"):
+        directory = bundle_root / subdirectory
+        if not directory.is_dir():
+            continue
+        for assembly in directory.rglob("*.dll"):
+            try:
+                os.remove(f"{assembly}:Zone.Identifier")
+                removed += 1
+            except OSError:
+                continue
+    if removed:
+        logging.getLogger("careerdesk.launcher").warning(
+            "removed mark-of-the-web from %d bundled .NET assemblies", removed,
+        )
+    return removed
+
+
+def _run_window_smoke() -> int:
+    """Report whether the bundled native window stack can start on this host.
+
+    CI runs this inside the frozen executable so a broken WebView2/pythonnet
+    bundle becomes visible in build logs instead of first failing on a user's
+    machine as a silent browser fallback.
+    """
+    _unblock_dotnet_assemblies()
+    try:
+        import webview
+
+        window = webview.create_window(
+            "CareerDesk window smoke", html="<html></html>", hidden=True,
+        )
+        timer = threading.Timer(3.0, window.destroy)
+        timer.daemon = True
+        timer.start()
+        webview.start()
+    except BaseException as error:  # noqa: BLE001 -- the exact reason must reach CI logs
+        print(f"WINDOW_SMOKE_FAILED error_type={type(error).__name__} detail={error}")
+        return 0
+    print("WINDOW_SMOKE_OK")
+    return 0
+
+
+def _stop_server_for_exit(runtime: ServerRuntime) -> bool:
+    """Stop Uvicorn for process exit without ever leaving a hidden resident process.
+
+    Returns False only when even the forced stop timed out; the caller must then
+    end the process, which releases the OS-level instance lock atomically with
+    thread death instead of releasing it while a worker could still write.
+    """
+    if _request_server_shutdown(runtime, timeout=_GRACEFUL_CLOSE_SECONDS):
+        return True
+    print(_startup_text(
+        "🔧 在途任务未在限时内结束，正在强制停止后端…",
+        "🔧 In-flight work did not finish in time; forcing the backend to stop…",
+    ))
+    runtime.force_shutdown()
+    return runtime.wait_for_exit(timeout=_FORCED_CLOSE_SECONDS)
+
+
 def _release_instance_lock_if_server_stopped(
     instance_lock,
     runtime: ServerRuntime | None,
@@ -518,6 +678,8 @@ def _release_instance_lock_if_server_stopped(
 def main() -> int:
     """Prepare config/assets, start Uvicorn, then open the native window."""
     configure_console_streams()
+    if os.environ.get("CAREERDESK_WINDOW_SMOKE") == "1":
+        return _run_window_smoke()
     os.chdir(HERE)  # Stabilize cwd; resources and writable roots use absolute paths.
     instance_lock = None
     server_runtime = None
@@ -562,6 +724,17 @@ def main() -> int:
             ensure_env()
 
         if _port_in_use(HOST, PORT):
+            if _existing_careerdesk_instance(PORT):
+                # Browser-fallback sessions have no window to close, so a prior
+                # instance may legitimately still be serving. Reopening its UI is
+                # what this launch means; a port error would send the user to the
+                # task manager instead.
+                print(_startup_text(
+                    f"🔧 CareerDesk 已在运行，正在打开现有实例 → {URL}",
+                    f"🔧 CareerDesk is already running; opening the existing instance → {URL}",
+                ))
+                _open_browser_unless_headless()
+                return 0
             _show_startup_error(
                 _startup_text(
                     f"端口 {PORT} 已被其他程序占用。请关闭占用者后重开；如需独立第二实例，必须同时指定新端口和不同的 APP_DATA_DIR。",
@@ -585,6 +758,7 @@ def main() -> int:
         # failures into SystemExit(3). This preserves actionable migration errors.
         from careerdesk.platform.database import init_db
 
+        _configure_file_logging(settings)
         init_db(settings.db_path)
         # The lock covers the database and initial build, preventing duplicate npm.
         ensure_dist(strict_offline=settings.strict_offline)
@@ -601,14 +775,25 @@ def main() -> int:
             # The single-owner lock remains held until the real thread exits.
             timeout_graceful_shutdown=None,
         )))
+        _attach_uvicorn_file_logging()
         _start_server_and_wait(server_runtime)
 
+        webview_unavailable: Exception | None = None
+        _unblock_dotnet_assemblies()
         try:
             import webview  # Standard dependency; unsupported hosts use a browser.
-        except ImportError:
+        except ImportError as import_error:
             webview = None
+            webview_unavailable = import_error
         if os.environ.get("NO_WINDOW") or _headless_mode():
             webview = None
+            webview_unavailable = None
+        if webview is None and webview_unavailable is not None:
+            logging.getLogger("careerdesk.launcher").warning(
+                "native window unavailable error_type=%s detail=%s; using the browser instead",
+                type(webview_unavailable).__name__,
+                webview_unavailable,
+            )
 
         if webview is None:
             destination = (
@@ -627,6 +812,11 @@ def main() -> int:
             _create_main_window(webview)
             webview.start()
         except Exception as error:
+            logging.getLogger("careerdesk.launcher").warning(
+                "native window failed to start error_type=%s detail=%s; using the browser instead",
+                type(error).__name__,
+                error,
+            )
             opened = _open_browser_unless_headless()
             fallback = "退回浏览器" if opened else "保持无界面运行"
             print(f"🔧 原生窗口启动失败（{error}），{fallback} → {URL}（Ctrl-C 停止）")
@@ -640,15 +830,10 @@ def main() -> int:
         _show_startup_error(str(error))
         return 1
     finally:
+        clean_exit = True
         try:
             if server_runtime is not None:
-                # Uvicorn waits for in-flight requests; to_thread tools cannot be
-                # cancelled safely. Try a short wait, then wait indefinitely only
-                # when Thread.start() definitely returned.
-                stopped = _request_server_shutdown(server_runtime, timeout=1.0)
-                if not stopped and server_runtime.start_returned:
-                    print("🔧 正在等待在途 Agent/Tool 任务安全结束，数据锁会继续保持…")
-                    _request_server_shutdown(server_runtime)
+                clean_exit = _stop_server_for_exit(server_runtime)
         finally:
             # This is an idempotent fallback when lifespan owns release. Even if
             # Ctrl-C interrupts Event.wait, the guard trusts only _run's exit event.
@@ -670,6 +855,13 @@ def main() -> int:
                     except Exception as error:  # noqa: BLE001 -- next launch must disclose failure
                         record_migration_failure(error)
                         print(f"🔧 数据目录迁移未完成：{error}；旧目录仍保持有效。")
+            if not clean_exit:
+                print(_startup_text(
+                    "🔧 后端未能在限时内停止；强制结束进程，实例锁随进程释放。",
+                    "🔧 The backend did not stop in time; ending the process now. The instance lock is released with it.",
+                ))
+                logging.shutdown()
+                os._exit(0)
 
 
 if __name__ == "__main__":

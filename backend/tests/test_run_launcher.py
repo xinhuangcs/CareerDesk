@@ -721,3 +721,44 @@ def test_database_preflight_error_reaches_window_before_server_or_frontend(
         "数据库版本 v25 不是当前 fresh-only v28；本仓库不提供旧 schema 迁移"
     ]
     assert lock.releases == 1
+
+
+def test_relaunch_reuses_a_healthy_existing_instance(monkeypatch, tmp_path):
+    """A second launch must reopen the running app, never demand a task-manager kill."""
+    env_file = tmp_path / "settings.env"
+    env_file.write_text("", encoding="utf-8")
+    opened: list[bool] = []
+    messages: list[str] = []
+
+    monkeypatch.setattr(launcher, "ENV_FILE", env_file)
+    monkeypatch.setattr(launcher, "ensure_env", lambda: None)
+    monkeypatch.setattr(launcher, "_port_in_use", lambda *_args: True)
+    monkeypatch.setattr(launcher, "_existing_careerdesk_instance", lambda *_args: True)
+    monkeypatch.setattr(
+        launcher, "_open_browser_unless_headless", lambda: opened.append(True) or True,
+    )
+    monkeypatch.setattr(launcher, "_show_startup_error", messages.append)
+    monkeypatch.setattr(
+        launcher,
+        "_load_installed_credentials",
+        lambda: (_ for _ in ()).throw(AssertionError("healthy reuse must return before startup")),
+    )
+
+    assert launcher.main() == 0
+    assert opened == [True]
+    assert messages == []
+
+
+def test_relaunch_still_reports_a_foreign_port_owner(monkeypatch, tmp_path):
+    env_file = tmp_path / "settings.env"
+    env_file.write_text("", encoding="utf-8")
+    messages: list[str] = []
+
+    monkeypatch.setattr(launcher, "ENV_FILE", env_file)
+    monkeypatch.setattr(launcher, "ensure_env", lambda: None)
+    monkeypatch.setattr(launcher, "_port_in_use", lambda *_args: True)
+    monkeypatch.setattr(launcher, "_existing_careerdesk_instance", lambda *_args: False)
+    monkeypatch.setattr(launcher, "_show_startup_error", messages.append)
+
+    assert launcher.main() == 2
+    assert messages and "端口" in messages[0]

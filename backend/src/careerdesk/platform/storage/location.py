@@ -234,14 +234,17 @@ def _write_configured_data_dir(destination: Path) -> None:
             os.fsync(output.fileno())
         set_key(str(staged), "APP_DATA_DIR", str(destination), quote_mode="always")
         os.chmod(staged, 0o600)
-        with staged.open("rb") as handle:
+        # A read-only handle cannot be flushed on Windows, and directories cannot
+        # be opened there at all; both durability steps are POSIX-only semantics.
+        with staged.open("r+b") as handle:
             os.fsync(handle.fileno())
         os.replace(staged, path)
-        directory_fd = os.open(path.parent, os.O_RDONLY)
-        try:
-            os.fsync(directory_fd)
-        finally:
-            os.close(directory_fd)
+        if os.name == "posix":
+            directory_fd = os.open(path.parent, os.O_RDONLY)
+            try:
+                os.fsync(directory_fd)
+            finally:
+                os.close(directory_fd)
     finally:
         try:
             staged.unlink()

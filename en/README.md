@@ -19,7 +19,7 @@
   <a href="../backend/"><img alt="Backend FastAPI" src="https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&amp;logo=fastapi&amp;logoColor=white" /></a>
   <a href="../frontend/"><img alt="Frontend React 19" src="https://img.shields.io/badge/Frontend-React%2019-61DAFB?style=for-the-badge&amp;logo=react&amp;logoColor=20232A" /></a>
   <br />
-  <a href="../backend/pyproject.toml"><img alt="Version 1.0.0" src="https://img.shields.io/badge/Version-v1.0.0-EA6B38?style=for-the-badge" /></a>
+  <a href="../backend/pyproject.toml"><img alt="Version 1.0.1" src="https://img.shields.io/badge/Version-v1.0.1-EA6B38?style=for-the-badge" /></a>
   <a href="https://github.com/xinhuangcs/CareerDesk/actions/workflows/unsigned-release.yml"><img alt="Build GitHub Actions" src="https://img.shields.io/badge/Build-GitHub%20Actions-6E78FF?style=for-the-badge&amp;logo=githubactions&amp;logoColor=white" /></a>
   <a href="../LICENSE"><img alt="License MIT" src="https://img.shields.io/badge/License-MIT-E1B800?style=for-the-badge" /></a>
 </p>
@@ -98,7 +98,7 @@ This project does not buy Apple or Microsoft code-signing certificates, so both 
 
 **macOS**
 
-1. Unzip and move `CareerDesk.app` into your Applications folder
+1. Unzip and move `CareerDesk.app` into your Applications folder (or anywhere you like — your data never moves with the app)
 2. Double-click it. macOS says the developer cannot be verified — click **Done**
 3. Open **System Settings → Privacy & Security**, scroll to the **Security** section
 4. Find "CareerDesk was blocked" and click **Open Anyway**
@@ -106,12 +106,18 @@ This project does not buy Apple or Microsoft code-signing certificates, so both 
 
 **Windows**
 
-1. **Extract the whole archive first** — do not run it from inside the zip
+1. **Extract the whole archive first** (any location works) — do not run it from inside the zip
 2. Run `CareerDesk.exe` inside the `CareerDesk` folder
 3. When "Windows protected your PC" appears, click **More info**
 4. Click **Run anyway**
 
 Both are one-time steps.
+
+**Windows-only notes** (macOS users need none of this)
+
+- `careerdesk-data(.exe)` in the folder is the backup/restore command-line tool; double-clicking it shows usage. Open `CareerDesk` for everyday use.
+- The browser mode is fully functional; if you would rather have a standalone app window, install the Microsoft Edge WebView2 Runtime and reopen (the browser is used automatically when that component is missing).
+- For a desktop shortcut, double-click `Add-Desktop-Shortcut.cmd` inside the folder once; the icon it creates can be moved anywhere. Re-run it whenever you move the folder itself.
 
 ## 🔐 Privacy and Security
 

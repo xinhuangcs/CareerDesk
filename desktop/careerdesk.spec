@@ -19,6 +19,7 @@ SITE = Path(os.environ["CAREERDESK_FROZEN_SITE"]).resolve()
 PACKAGE = SITE / "careerdesk"
 VERSION = os.environ["CAREERDESK_BUILD_VERSION"]
 WINDOWS_VERSION_FILE = os.environ.get("CAREERDESK_WINDOWS_VERSION_FILE")
+WINDOWS_DATA_VERSION_FILE = os.environ.get("CAREERDESK_WINDOWS_DATA_VERSION_FILE")
 LEGAL = Path(os.environ["CAREERDESK_LEGAL_DIR"]).resolve()
 
 if not (PACKAGE / "default.env").is_file():
@@ -109,7 +110,7 @@ data_exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="CareerDeskData",
+    name="careerdesk-data",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -121,7 +122,7 @@ data_exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     icon=str(icon),
-    version=WINDOWS_VERSION_FILE if sys.platform == "win32" else None,
+    version=WINDOWS_DATA_VERSION_FILE if sys.platform == "win32" else None,
 )
 bundle = COLLECT(
     exe,

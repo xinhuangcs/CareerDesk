@@ -140,7 +140,7 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       # Signing boundary (do NOT add a signing certificate here). CI stays
       # zero-key/zero-custody: no --codesign-identity, no p12 Secret. Rationale
-      # See the CI signing-certificate rationale in desktop/README.md.
+      # Unsigned by design; the rationale is public in DISCLAIMER.md ("Unsigned convenience builds").
       - name: Build and verify the unsigned/ad-hoc macOS bundle
         shell: bash
         run: |
@@ -159,7 +159,7 @@ jobs:
           set -euo pipefail
           uv run --project backend python scripts/frozen_artifact_smoke.py \
             --desktop-executable "${RUNNER_TEMP}/desktop-output/dist/CareerDesk.app/Contents/MacOS/CareerDesk" \
-            --data-executable "${RUNNER_TEMP}/desktop-output/dist/CareerDesk.app/Contents/MacOS/CareerDeskData"
+            --data-executable "${RUNNER_TEMP}/desktop-output/dist/CareerDesk.app/Contents/MacOS/careerdesk-data"
       - name: Archive with an explicit unsigned filename
         shell: bash
         run: |
@@ -221,10 +221,12 @@ jobs:
             --output-dir "$env:RUNNER_TEMP\desktop-output"
       - name: Run the frozen application and data recovery smoke
         shell: pwsh
+        env:
+          CAREERDESK_SMOKE_KEYS: "1"
         run: |
           uv run --project backend python scripts/frozen_artifact_smoke.py `
             --desktop-executable "$env:RUNNER_TEMP\desktop-output\dist\CareerDesk\CareerDesk.exe" `
-            --data-executable "$env:RUNNER_TEMP\desktop-output\dist\CareerDesk\CareerDeskData.exe"
+            --data-executable "$env:RUNNER_TEMP\desktop-output\dist\CareerDesk\careerdesk-data.exe"
       - name: Archive with an explicit unsigned filename
         shell: pwsh
         run: |
@@ -303,27 +305,35 @@ jobs:
           notes="$(cat <<EOF
           ## Download and run
 
-          - **macOS (Apple Silicon):** Download \`CareerDesk-${version}-macos-arm64-UNSIGNED.zip\`, unzip it, then open \`CareerDesk.app\`.
-          - **Windows x64:** Download \`CareerDesk-${version}-windows-x64-UNSIGNED.zip\`, extract the entire archive, then run \`CareerDesk.exe\` inside the \`CareerDesk\` folder.
+          **macOS (Apple Silicon)** — download \`CareerDesk-${version}-macos-arm64-UNSIGNED.zip\`, unzip it, then open \`CareerDesk.app\`.
 
-          **First launch needs one manual approval.** These builds are unsigned, so the OS blocks them by default — that reflects the missing paid certificate, not a detected threat.
+          - First launch only: System Settings → Privacy & Security → Security → **Open Anyway**
+          - \`CareerDesk.app\` can live anywhere you like (Applications, Desktop, …); your data stays in the system user directory and never moves with the app.
 
-          - **macOS:** System Settings → Privacy & Security → Security → **Open Anyway**
-          - **Windows:** "Windows protected your PC" → **More info** → **Run anyway**
+          **Windows x64** — download \`CareerDesk-${version}-windows-x64-UNSIGNED.zip\`, extract the whole archive to any location you like, then run \`CareerDesk.exe\` inside the \`CareerDesk\` folder.
 
-          Verify the SHA-256 checksums and build attestation below if you want to confirm the download.
+          - First launch only: "Windows protected your PC" → **More info** → **Run anyway**
+          - Want a desktop shortcut? Double-click \`Add-Desktop-Shortcut.cmd\` in the folder once; the desktop icon it creates can be moved anywhere. If you move the folder later, double-click it again to refresh.
+          - \`careerdesk-data.exe\` in the same folder is the backup/restore command-line tool; daily use never needs it.
+          - Running in the browser works fully. If you would rather have a standalone app window, install the Microsoft Edge WebView2 Runtime and reopen.
+
+          The approval prompts above appear because these builds are unsigned — that reflects the missing paid certificate, not a detected threat. Verify the SHA-256 checksums and build attestation below if you want to confirm the download.
 
           ## 下载与运行
 
-          - **macOS（Apple 芯片）：** 下载 \`CareerDesk-${version}-macos-arm64-UNSIGNED.zip\`，解压后打开 \`CareerDesk.app\`。
-          - **Windows x64：** 下载 \`CareerDesk-${version}-windows-x64-UNSIGNED.zip\`，完整解压后运行 \`CareerDesk\` 文件夹中的 \`CareerDesk.exe\`。
+          **macOS（Apple 芯片）**——下载 \`CareerDesk-${version}-macos-arm64-UNSIGNED.zip\`，解压后打开 \`CareerDesk.app\`。
 
-          **首次打开需要手动放行一次。** 安装包未签名，系统默认会拦下——这是因为没有付费证书，不是检测到风险。
+          - 仅首次：系统设置 →「隐私与安全性」→「安全性」→ 点「仍要打开」
+          - \`CareerDesk.app\` 可以放在任意位置（应用程序、桌面等都行）；你的数据保存在系统用户目录中，不会跟着 App 移动。
 
-          - **macOS：** 系统设置 →「隐私与安全性」→「安全性」→ 点「仍要打开」
-          - **Windows：** 「Windows 已保护你的电脑」→「更多信息」→「仍要运行」
+          **Windows x64**——下载 \`CareerDesk-${version}-windows-x64-UNSIGNED.zip\`，把压缩包完整解压到任意位置，运行 \`CareerDesk\` 文件夹中的 \`CareerDesk.exe\`。
 
-          需要核对可用下方的 SHA-256 与构建来源证明。
+          - 仅首次：「Windows 已保护你的电脑」→「更多信息」→「仍要运行」
+          - 想要桌面快捷方式：双击文件夹里的 \`Add-Desktop-Shortcut.cmd\` 一次，桌面图标可随意移动；以后挪动了文件夹，再双击一次刷新即可。
+          - 同文件夹的 \`careerdesk-data.exe\` 是备份/恢复命令行工具，日常使用完全不需要碰它。
+          - 在浏览器中打开也可以完整使用；如果更想要独立的应用窗口，安装 Microsoft Edge WebView2 Runtime 后重新打开即可。
+
+          上面的放行提示只因安装包未签名——这是没有付费证书，不是检测到风险。需要核对可用下方的 SHA-256 与构建来源证明。
           EOF
           )"
           gh release create "${GITHUB_REF_NAME}" release-assets/* \

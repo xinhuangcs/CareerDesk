@@ -32,7 +32,7 @@ from ...platform.ai.providers import (
     provider_specs,
     validate_model_reference,
 )
-from ...platform.storage.private import prepare_private_file
+from ...platform.storage.private import ensure_private_directory, prepare_private_file
 
 # Display names fall back to the provider identifier for new framework entries.
 _PROVIDER_LABELS = {
@@ -353,6 +353,11 @@ def _stage_env_update(
 ) -> Path:
     """Stage the complete change in a private sibling without touching the target."""
     original = _read_env_bytes(env_file)
+    # A packaged build keeps this file in a managed config directory that nothing else
+    # creates. Create it only when absent: in a source layout the parent is the
+    # repository root, which must never be created or hardened from here.
+    if not env_file.parent.exists():
+        ensure_private_directory(env_file.parent)
     descriptor, staged_name = tempfile.mkstemp(
         dir=env_file.parent,
         prefix=f".{env_file.name}.staged-",
@@ -383,7 +388,9 @@ def _stage_env_update(
         if outbound_policy is not None:
             for field, value in outbound_policy.items():
                 set_key(staged, _OUTBOUND_POLICY_ENVS[field], "true" if value else "false")
-        staged_descriptor = os.open(staged, os.O_RDONLY)
+        # Windows FlushFileBuffers requires a writable handle; POSIX allows fsync
+        # on any descriptor. O_RDWR is the portable choice.
+        staged_descriptor = os.open(staged, os.O_RDWR)
         try:
             if os.name == "posix":
                 os.fchmod(staged_descriptor, 0o600)

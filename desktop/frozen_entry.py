@@ -11,7 +11,7 @@ def main() -> int:
 
         run_package_self_test()
         return 0
-    if Path(sys.executable).stem.casefold() == "careerdeskdata":
+    if Path(sys.executable).stem.casefold() == "careerdesk-data":
         from careerdesk.bootstrap.cli import main as cli_main
 
         return cli_main()

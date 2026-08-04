@@ -145,6 +145,7 @@ def test_build_environment_strips_credentials_and_points_discovery_at_wheel(tmp_
         site=tmp_path / "site",
         version="0.1.0",
         windows_version_file=None,
+        windows_data_version_file=None,
         legal_dir=tmp_path / "legal",
     )
 
@@ -180,7 +181,13 @@ def test_packaging_cli_reconfigures_redirected_windows_output(monkeypatch):
 def test_windows_version_resource_is_numeric_and_product_scoped(tmp_path):
     version_file = tmp_path / "windows-version.txt"
 
-    package_desktop._windows_version_file("2.7.3", version_file)
+    package_desktop._windows_version_file(
+        "2.7.3",
+        version_file,
+        description="CareerDesk career assistant",
+        internal_name="CareerDesk",
+        original_filename="CareerDesk.exe",
+    )
 
     content = version_file.read_text(encoding="utf-8")
     assert "filevers=(2, 7, 3, 0)" in content
@@ -219,7 +226,7 @@ def test_build_manifest_contract_has_no_signing_claim(
             assert kwargs["check"] is True
             return
         if kwargs.get("env", {}).get("CAREERDESK_PACKAGE_SELF_TEST") == "1":
-            assert command == [str(output / "dist/CareerDesk.app/Contents/MacOS/CareerDeskData")]
+            assert command == [str(output / "dist/CareerDesk.app/Contents/MacOS/careerdesk-data")]
             assert kwargs["cwd"] == output / "dist/CareerDesk.app"
             assert kwargs["timeout"] == 60
             return
@@ -230,7 +237,7 @@ def test_build_manifest_contract_has_no_signing_claim(
         executable = artifact / "Contents/MacOS/CareerDesk"
         executable.parent.mkdir(parents=True)
         executable.write_bytes(b"executable")
-        (executable.parent / "CareerDeskData").write_bytes(b"data-executable")
+        (executable.parent / "careerdesk-data").write_bytes(b"data-executable")
         resource_root = artifact / "Contents/Resources/careerdesk"
         (resource_root / "frontend_dist").mkdir(parents=True)
         (resource_root / "default.env").write_text("", encoding="utf-8")
@@ -268,7 +275,7 @@ def test_build_manifest_contract_has_no_signing_claim(
     assert manifest["code_signing"] == expected_signing
     assert len(manifest["wheel_sha256"]) == 64
     assert len(manifest["executable_sha256"]) == 64
-    assert manifest["data_executable"].endswith("/CareerDeskData")
+    assert manifest["data_executable"].endswith("/careerdesk-data")
     assert len(manifest["data_executable_sha256"]) == 64
     assert manifest["legal_notices"] is True
     assert len(manifest["python_notice_index_sha256"]) == 64
@@ -324,7 +331,7 @@ def test_spec_uses_installed_wheel_resources_and_platform_native_artifacts():
     assert 'name="CareerDesk.app"' in source
     assert 'bundle_identifier="com.careerdesk.desktop"' in source
     assert 'name="CareerDesk"' in source
-    assert 'name="CareerDeskData"' in source
+    assert 'name="careerdesk-data"' in source
     assert "console=False" in source
     assert "console=True" in source
     assert "COLLECT(" in source
@@ -335,3 +342,15 @@ def test_spec_uses_installed_wheel_resources_and_platform_native_artifacts():
     assert source.count("codesign_identity=None") == 3
     assert "--onefile" not in source
     assert "SOURCE_LAYOUT" not in source
+
+
+def test_windows_shortcut_helper_targets_its_own_folder():
+    """The shipped helper must locate the app by its own position, never a fixed path."""
+    helper = (REPO_ROOT / "desktop" / "add-desktop-shortcut.cmd").read_bytes()
+    source = helper.decode("utf-8")
+
+    assert b"\r\n" in helper
+    assert 'set "APP_DIR=%~dp0"' in source
+    assert "GetFolderPath('Desktop')" in source
+    assert "CareerDesk.exe" in source
+    assert "pause" in source

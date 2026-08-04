@@ -19,7 +19,7 @@
   <a href="backend/"><img alt="后端 FastAPI" src="https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&amp;logo=fastapi&amp;logoColor=white" /></a>
   <a href="frontend/"><img alt="前端 React 19" src="https://img.shields.io/badge/Frontend-React%2019-61DAFB?style=for-the-badge&amp;logo=react&amp;logoColor=20232A" /></a>
   <br />
-  <a href="backend/pyproject.toml"><img alt="版本 1.0.0" src="https://img.shields.io/badge/Version-v1.0.0-EA6B38?style=for-the-badge" /></a>
+  <a href="backend/pyproject.toml"><img alt="版本 1.0.1" src="https://img.shields.io/badge/Version-v1.0.1-EA6B38?style=for-the-badge" /></a>
   <a href="https://github.com/xinhuangcs/CareerDesk/actions/workflows/unsigned-release.yml"><img alt="构建 GitHub Actions" src="https://img.shields.io/badge/Build-GitHub%20Actions-6E78FF?style=for-the-badge&amp;logo=githubactions&amp;logoColor=white" /></a>
   <a href="LICENSE"><img alt="MIT 许可证" src="https://img.shields.io/badge/License-MIT-E1B800?style=for-the-badge" /></a>
 </p>
@@ -98,7 +98,7 @@ https://github.com/user-attachments/assets/5230d010-0f2d-493e-b088-3bbbd7969572
 
 **macOS**
 
-1. 解压后把 `CareerDesk.app` 拖进「应用程序」文件夹
+1. 解压后把 `CareerDesk.app` 拖到「应用程序」文件夹（或桌面等任意位置；数据不跟随 App 移动）
 2. 双击打开，会提示无法验证开发者——点「完成」
 3. 打开「系统设置」→「隐私与安全性」，向下滚动到「安全性」一栏
 4. 找到「已阻止使用 CareerDesk」，点右侧的「仍要打开」
@@ -106,12 +106,18 @@ https://github.com/user-attachments/assets/5230d010-0f2d-493e-b088-3bbbd7969572
 
 **Windows**
 
-1. **先把压缩包完整解压**，不要在压缩包里直接运行
+1. **先把压缩包完整解压**（放到任意你喜欢的位置都行），不要在压缩包里直接运行
 2. 运行 `CareerDesk` 文件夹里的 `CareerDesk.exe`
 3. 出现「Windows 已保护你的电脑」时，点「更多信息」
 4. 点「仍要运行」
 
 两个系统都只需做一次，之后正常打开即可。
+
+**Windows 常见疑问**（以下仅涉及 Windows；macOS 用户无需任何额外操作）
+
+- 文件夹里的 `careerdesk-data(.exe)` 是备份/恢复命令行工具，双击会显示使用说明；日常使用请打开 `CareerDesk`。
+- 应用在浏览器里打开时功能完全相同；如果更想要独立的应用窗口，安装 Microsoft Edge WebView2 Runtime 后重新打开即可（缺少该组件时会自动改用浏览器）。
+- 想要桌面快捷方式：双击文件夹里的 `Add-Desktop-Shortcut.cmd` 一次；生成的桌面图标可以随意移动。以后挪动了文件夹，再双击一次刷新即可。
 
 ## 🔐 隐私与安全
 

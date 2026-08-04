@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, model_
 
 from ...auth import current_user_id
 from ...platform.storage import location as storage_location
+from ...platform.http.problem_details import log_sanitized_failure
 from . import service
 
 router = APIRouter(prefix="/api/settings")
@@ -245,6 +246,9 @@ def update_settings(payload: SettingsUpdate,
         raise HTTPException(status_code=409, detail=str(e)) from e
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
+    except Exception as error:
+        log_sanitized_failure("settings_save", error)
+        raise
 
 
 @router.post("/system-timezone", response_model=SystemTimezoneSyncResponse)
@@ -264,6 +268,9 @@ def sync_system_timezone(
         )
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
+    except Exception as error:
+        log_sanitized_failure("timezone_sync", error)
+        raise
 
 
 @router.post(

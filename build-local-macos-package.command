@@ -117,7 +117,7 @@ fi
 print "[5/7] 启动冻结应用并验证页面、数据库与备份恢复…"
 uv run --project backend python scripts/frozen_artifact_smoke.py \
   --desktop-executable "$APP/Contents/MacOS/CareerDesk" \
-  --data-executable "$APP/Contents/MacOS/CareerDeskData"
+  --data-executable "$APP/Contents/MacOS/careerdesk-data"
 
 print "[6/7] 组装明确标记 UNSIGNED 的本地安装包…"
 STAGED_DIRECTORY="$STAGING_ROOT/$PACKAGE_NAME"

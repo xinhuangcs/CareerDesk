@@ -326,5 +326,5 @@ def test_distribution_and_frozen_bundle_expose_data_maintenance_cli():
     frozen_entry = (root / "desktop/frozen_entry.py").read_text(encoding="utf-8")
 
     assert 'careerdesk-data = "careerdesk.bootstrap.cli:main"' in pyproject
-    assert 'stem.casefold() == "careerdeskdata"' in frozen_entry
+    assert 'stem.casefold() == "careerdesk-data"' in frozen_entry
     assert "careerdesk.bootstrap.cli" in frozen_entry

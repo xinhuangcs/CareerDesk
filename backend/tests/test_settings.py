@@ -1180,3 +1180,83 @@ def test_strict_offline_allows_dormant_openai_compatible_with_invalid_endpoint(
     content = env_file.read_text(encoding="utf-8")
     assert "openai_compatible:custom-model" in content
     assert "secret" not in content
+
+
+def test_first_save_creates_the_managed_config_directory(tmp_path, monkeypatch):
+    """A packaged build keeps settings.env in a directory nothing else creates.
+
+    Source layouts never exercise this: their parent is the repository root, which
+    always exists, so the missing directory only ever surfaced for installed users.
+    """
+    config_dir = tmp_path / "CareerDesk" / "config"
+    assert not config_dir.exists()
+
+    staged = settings_service._stage_env_update(
+        config_dir / "settings.env",
+        model_given=True,
+        model_value="deepseek",
+        capability_updates={},
+        keys={},
+        outbound_policy=None,
+    )
+
+    assert config_dir.is_dir()
+    assert stat.S_IMODE(config_dir.stat().st_mode) == 0o700
+    assert staged.parent == config_dir
+
+
+def test_staging_never_creates_or_hardens_an_existing_parent(tmp_path):
+    """A source checkout keeps .env in the repository root; it must stay untouched."""
+    repository_root = tmp_path / "checkout"
+    repository_root.mkdir(mode=0o755)
+    before = stat.S_IMODE(repository_root.stat().st_mode)
+
+    settings_service._stage_env_update(
+        repository_root / ".env",
+        model_given=True,
+        model_value="deepseek",
+        capability_updates={},
+        keys={},
+        outbound_policy=None,
+    )
+
+    assert stat.S_IMODE(repository_root.stat().st_mode) == before
+
+
+def test_save_failures_always_leave_a_sanitized_log_line(client, monkeypatch, caplog):
+    """Every failing save must leave frames in the log without the message text."""
+    def explode(**_kwargs):
+        raise RuntimeError("secret-value /private/leak.db")
+
+    monkeypatch.setattr(settings_service, "save", explode)
+
+    with pytest.raises(RuntimeError):
+        put_settings(client, {"outbound_policy": DEFAULT_POLICY})
+
+    assert "operation=settings_save" in caplog.text
+    assert "error_type=RuntimeError" in caplog.text
+    assert "frames=" in caplog.text
+    assert "secret-value" not in caplog.text
+    assert "/private/leak.db" not in caplog.text
+
+
+def test_staging_survives_windows_style_fsync_semantics(tmp_path, monkeypatch):
+    """Windows refuses to flush read-only handles; staging must hold a writable one."""
+    real_fsync = os.fsync
+
+    def windows_like_fsync(descriptor: int) -> None:
+        os.write(descriptor, b"")
+        real_fsync(descriptor)
+
+    monkeypatch.setattr(settings_service.os, "fsync", windows_like_fsync)
+
+    staged = settings_service._stage_env_update(
+        tmp_path / "settings.env",
+        model_given=True,
+        model_value="deepseek",
+        capability_updates={},
+        keys={},
+        outbound_policy=None,
+    )
+
+    assert staged.parent == tmp_path

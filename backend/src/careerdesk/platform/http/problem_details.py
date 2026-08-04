@@ -1,6 +1,7 @@
 """Shared HTTP error contract and per-request trace identifiers."""
 
 import logging
+import traceback
 from collections.abc import Mapping
 from http import HTTPStatus
 from typing import Any
@@ -173,16 +174,42 @@ async def _validation_exception_handler(
 
 async def _unhandled_exception_handler(request: Request, error: Exception) -> JSONResponse:
     request_id = ensure_request_id(request.scope)
+    # Frame locations identify the failure. Exception messages and source lines may
+    # embed secrets or private paths and must never reach logs, matching the
+    # sanitized response body.
     logger.error(
-        "unhandled HTTP request failure request_id=%s error_type=%s",
+        "unhandled HTTP request failure request_id=%s error_type=%s frames=%s",
         request_id,
         type(error).__name__,
+        _frame_summary(error),
     )
     return problem_response(
         request.scope,
         status_code=500,
         detail="服务器处理请求时发生错误。",
         code="internal_error",
+    )
+
+
+def _frame_summary(error: BaseException) -> str:
+    return " <- ".join(
+        f"{frame.filename}:{frame.lineno}:{frame.name}"
+        for frame in reversed(traceback.extract_tb(error.__traceback__))
+    )
+
+
+def log_sanitized_failure(operation: str, error: BaseException) -> None:
+    """Record a failure's type and frame locations without its message.
+
+    Handler layers between a feature and the transport may answer without ever
+    logging; calling this at the operation boundary guarantees one diagnostic
+    line per failure while honoring the no-message log contract.
+    """
+    logger.warning(
+        "operation failed operation=%s error_type=%s frames=%s",
+        operation,
+        type(error).__name__,
+        _frame_summary(error),
     )
 
 
