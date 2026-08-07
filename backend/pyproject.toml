@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "careerdesk"
-version = "1.0.1"
+version = "1.0.2"
 description = "CareerDesk：辅助秋招的求职助手 agent（简历 / 匹配 / 追问 / 研究），基于 agentmaker。"
 requires-python = ">=3.12,<3.14"
 authors = [{ name = "xinhuang" }]

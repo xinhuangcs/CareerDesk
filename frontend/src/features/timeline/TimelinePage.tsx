@@ -2877,8 +2877,8 @@ export function TimelinePage() {
                   );
                 })}
               </div>
-              <div className="card overflow-hidden">
-                <div className="flex items-center gap-3 border-b border-line-2 bg-panel-2/70 px-4 py-2 text-xs font-medium text-ink-3">
+              <div className="card min-h-0 overflow-y-auto">
+                <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-line-2 bg-panel-2/70 backdrop-blur px-4 py-2 text-xs font-medium text-ink-3">
                   <span className="w-14 shrink-0">{l("优先级", "Priority")}</span>
                   <span className="w-40 shrink-0">{l("公司", "Company")}</span>
                   <span className="min-w-0 flex-1">{l("岗位", "Role")}</span>

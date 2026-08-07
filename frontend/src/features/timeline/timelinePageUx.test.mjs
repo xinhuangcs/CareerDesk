@@ -568,6 +568,16 @@ test("list mode starts with explicit aligned column labels", async () => {
   );
 });
 
+test("list view scrolls inside the locked desktop page with a pinned header", async () => {
+  const source = await readFile(pageUrl, "utf8");
+  assert.match(source, /className="card min-h-0 overflow-y-auto"/);
+  assert.match(
+    source,
+    /sticky top-0 z-10 flex items-center gap-3 border-b border-line-2 bg-panel-2\/70 backdrop-blur/,
+  );
+  assert.doesNotMatch(source, /className="card overflow-hidden"/);
+});
+
 test("detail actions, notes, and research status use the compact requested layout", async () => {
   const source = await readFile(pageUrl, "utf8");
   assert.doesNotMatch(source, /aria-label="更多操作"/);

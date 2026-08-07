@@ -113,6 +113,8 @@ This project does not buy Apple or Microsoft code-signing certificates, so both 
 
 Both are one-time steps.
 
+**Upgrading:** simply download the new build and install it the same way, replacing the old one; your data lives in the system user data directory (not in the app folder) and carries over automatically.
+
 **Windows-only notes** (macOS users need none of this)
 
 - `careerdesk-data(.exe)` in the folder is the backup/restore command-line tool; double-clicking it shows usage. Open `CareerDesk` for everyday use.
